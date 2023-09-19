@@ -8,10 +8,13 @@ PAGE = $(BUILD)/index.html
 FENG = $(BUILD)/fengari-web.js
 FENG_URL = https://github.com/fengari-lua/fengari-web/releases/download/v0.1.4/fengari-web.js 
 
-all: $(JS) $(PAGE)
+all: $(JS) $(PAGE) $(BUILD)/luastate.js
 
 run: all
 	emrun $(PAGE)
+
+$(BUILD)/luastate.js: $(SRC)/luastate.js
+	cp $(SRC)/luastate.js $(BUILD)/luastate.js
 
 $(PAGE): $(SRC)/index.html
 	cp $(SRC)/index.html $(PAGE)
