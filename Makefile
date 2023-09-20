@@ -1,7 +1,9 @@
 CC = em++
-CFLAGS = -s USE_SDL=2
+CFLAGS = -s USE_SDL=2 -sEXPORTED_FUNCTIONS=_drawSquare,_main -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
 BUILD = build
 SRC = src
+
+SRCS = $(SRC)/*.cpp
 
 JS = $(BUILD)/page.js
 PAGE = $(BUILD)/index.html
@@ -19,8 +21,8 @@ $(BUILD)/luastate.js: $(SRC)/luastate.js
 $(PAGE): $(SRC)/index.html
 	cp $(SRC)/index.html $(PAGE)
 
-$(JS): $(SRC)/main.cpp $(FENG)
-	em++ $(SRC)/main.cpp -o $(JS) $(CFLAGS)
+$(JS): $(SRCS) $(FENG)
+	em++ $(SRCS) -o $(JS) $(CFLAGS)
 
 $(FENG):
 	curl -L -o $(FENG) $(FENG_URL)

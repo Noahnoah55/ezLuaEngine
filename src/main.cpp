@@ -1,6 +1,8 @@
 #include<iostream>
 #include<emscripten.h>
 #include<SDL2/SDL.h>
+#include"api.hpp"
+#include"singletons.hpp"
 
 SDL_Window *window;
 SDL_Renderer *renderer;
@@ -42,7 +44,6 @@ void mainloop() {
     // Create and draw a rectangle like in the earlier `ctx.fillRect()`.
     SDL_Rect rect = {.x = 10+a, .y = 10, .w = 150, .h = 100};
     SDL_RenderFillRect(renderer, &rect);
-
     a++;
 
     // Render everything from a buffer to the actual screen.
@@ -55,6 +56,7 @@ int main() {
 
     SDL_CreateWindowAndRenderer(600,300,0,&window, &renderer);
     init_lua();
+    init_api();
     emscripten_set_main_loop(mainloop, 0, 1);
 
     SDL_Quit();
