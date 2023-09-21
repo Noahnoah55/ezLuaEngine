@@ -27,14 +27,7 @@ void mainloop() {
     // Poll events
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
-        if (e.type == SDL_KEYUP) {
-            if (e.key.keysym.scancode == SDL_SCANCODE_RETURN) {
-                //std::cout << "Enter pressed\n";
-            }
-            if (e.key.keysym.scancode == SDL_SCANCODE_Q) {
-                //std::cout << "Q pressed\n";
-            }
-        }
+        // Maybe useful later? At least this will still pump events
     }
 
     lua_update();
