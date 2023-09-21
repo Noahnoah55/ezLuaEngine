@@ -16,6 +16,9 @@ function add_func(fname, ret, args) {
                 case 'number':
                     arglist.push(lua.lua_tonumber(L, i));
                     break;
+                case 'str':
+                    arglist.push(stringToNewUTF8(lua.lua_tojsstring(L,i)));
+                    break;
             }
             i++;
         }
@@ -32,3 +35,9 @@ function add_func(fname, ret, args) {
     })
     lua.lua_register(L, fname, func)
 }
+
+lua.lua_register(L, "log", (function() {
+    str = lua.lua_tojsstring(L, 1);
+    console.log(str)
+    return 0;
+}))

@@ -1,5 +1,5 @@
 CC = em++
-CFLAGS = -s USE_SDL=2 -sEXPORTED_FUNCTIONS=_drawSquare,_getKey,_main -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
+CFLAGS = -s USE_SDL=2 -sEXPORTED_FUNCTIONS=_drawSquare,_getKey,_logMsg,_main -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
 BUILD = build
 SRC = src
 

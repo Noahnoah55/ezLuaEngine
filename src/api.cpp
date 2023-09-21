@@ -1,12 +1,14 @@
 #include<emscripten.h>
 #include<iostream>
+#include<stdio.h>
 #include<SDL2/SDL.h>
 #include"singletons.hpp"
 
 void init_api() {
     EM_ASM(
         add_func("drawSquare", null, ['number', 'number', 'number', 'number']);
-        add_func("getKey", 'number', ['number']);
+        add_func("getKey", 'number', ['str']);
+        add_func("logMsg", null, ['str']);
     );
 }
 
@@ -18,7 +20,7 @@ void _drawSquare(int x0, int y0, int x1, int y1) {
     rect.h = y1;
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, &rect);
-    std::cout << rect.x << rect.y << rect.w << rect.h << "\n";
+    //std::cout << rect.x << rect.y << rect.w << rect.h << "\n";
 }
 
 extern "C" {
@@ -27,10 +29,15 @@ extern "C" {
         _drawSquare(x0, y0, x1, y1);
     }
 
-    int getKey(int keycode)
+    int getKey(char *keyname)
     {
         int len;
         const Uint8* keystate = SDL_GetKeyboardState(&len);
-        return keystate[keycode];
+        return keystate[SDL_GetScancodeFromName(keyname)];
+    }
+
+    void logMsg(char *msg) {
+        printf("[LUA] %s\n", msg);
+        free(msg);
     }
 }
