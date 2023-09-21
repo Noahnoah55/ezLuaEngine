@@ -12,11 +12,22 @@ function add_func(fname, ret, args) {
         arglist = [];
         i = 1;
         for (arg in args) {
-            arglist.push(lua.lua_tonumber(L, i));
-            console.log(arglist[i]);
+            switch (args[arg]) {
+                case 'number':
+                    arglist.push(lua.lua_tonumber(L, i));
+                    break;
+            }
             i++;
         }
-        ccall(fname, ret, args, arglist);
+        var retval = ccall(fname, ret, args, arglist);
+        switch (ret) {
+            case 'number':
+                lua.lua_pushnumber(L, retval);
+                //console.log(retval);
+                return 1;
+            case null:
+                return 0;
+        }
         return 0;
     })
     lua.lua_register(L, fname, func)

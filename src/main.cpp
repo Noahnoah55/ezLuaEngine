@@ -29,10 +29,10 @@ void mainloop() {
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_KEYUP) {
             if (e.key.keysym.scancode == SDL_SCANCODE_RETURN) {
-                std::cout << "Enter pressed\n";
+                //std::cout << "Enter pressed\n";
             }
             if (e.key.keysym.scancode == SDL_SCANCODE_Q) {
-                std::cout << "Q pressed\n";
+                //std::cout << "Q pressed\n";
             }
         }
     }

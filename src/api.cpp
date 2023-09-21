@@ -5,11 +5,12 @@
 
 void init_api() {
     EM_ASM(
-        add_func("drawSquare", 'number', ['number', 'number', 'number', 'number']);
+        add_func("drawSquare", null, ['number', 'number', 'number', 'number']);
+        add_func("getKey", 'number', ['number']);
     );
 }
 
-int _drawSquare(int x0, int y0, int x1, int y1) {
+void _drawSquare(int x0, int y0, int x1, int y1) {
     SDL_Rect rect;
     rect.x = x0;
     rect.y = y0;
@@ -18,12 +19,18 @@ int _drawSquare(int x0, int y0, int x1, int y1) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, &rect);
     std::cout << rect.x << rect.y << rect.w << rect.h << "\n";
-    return 0;
 }
 
 extern "C" {
-    int drawSquare(int x0, int y0, int x1, int y1)
+    void drawSquare(int x0, int y0, int x1, int y1)
     {
-        return _drawSquare(x0, y0, x1, y1);
+        _drawSquare(x0, y0, x1, y1);
+    }
+
+    int getKey(int keycode)
+    {
+        int len;
+        const Uint8* keystate = SDL_GetKeyboardState(&len);
+        return keystate[keycode];
     }
 }
