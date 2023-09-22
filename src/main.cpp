@@ -1,27 +1,33 @@
 #include<iostream>
 #include<emscripten.h>
 #include<SDL2/SDL.h>
+#include"../lua/lua.h"
+#include"../lua/lauxlib.h"
+#include"../lua/lualib.h"
 #include"api.hpp"
 #include"singletons.hpp"
 
 SDL_Window *window;
 SDL_Renderer *renderer;
+lua_State *L;
 int a = 1;
 
-EM_JS(void, init_lua, (), {
-    lualib.luaL_openlibs(L);
-    lauxlib.luaL_dofile(L,fengari.to_luastring("main.lua"));
-});
+void init_lua() {
+    L = luaL_newstate(); // Perhaps make my own allocater later?
+    luaL_openlibs(L);
+    luaL_dofile(L, "main.lua");
+}
 
-EM_JS(void, lua_update, (), {
-    lua.lua_getglobal(L, fengari.to_luastring("_update"));
-    if (lua.lua_isfunction(L, -1)) {
-        lua.lua_call(L, 0, 0);
+void lua_update() {
+    if (lua_getglobal(L, "_update") && lua_isfunction(L, -1)) {
+        if (lua_pcall(L, 0, 0, 0) != 0) {
+            std::cout << "Error running _update()\n";
+        }
     }
     else {
-        console.log("_update is not a function");
+        std::cout << "Could not find function _update()\n";
     }
-})
+}
 
 void mainloop() {
     // Poll events
