@@ -15,7 +15,7 @@ int a = 1;
 void init_lua() {
     L = luaL_newstate(); // Perhaps make my own allocater later?
     luaL_openlibs(L);
-    luaL_dofile(L, "main.lua");
+    luaL_dostring(L, "function _update()\n\tlogMsg(\"Test!\")\nend");
 }
 
 void lua_update() {

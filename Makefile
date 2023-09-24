@@ -22,10 +22,9 @@ $(PAGE): $(SRC)/index.html $(BUILD)
 
 $(ENGINE): $(SRCS) $(BUILD) $(LUA_A)
 	$(CXX) $(LUA_A) $(SRCS) -o $(ENGINE) $(CXXFLAGS)
-	rm *.o
 
 $(LUA_A): $(LUA_SRC)
-	$(CC) $(LUA_SRC) -c
+	$(CXX) $(LUA_SRC) -c
 	emar qc $(LUA_A) *.o
 	emranlib $(LUA_A)
 	rm *.o

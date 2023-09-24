@@ -1,6 +1,6 @@
 # ezLuaEngine
 
-WIP web game engine using emscripten and LUA via fengari
+WIP web game engine using emscripten and LUA
 
 ## Building
 
