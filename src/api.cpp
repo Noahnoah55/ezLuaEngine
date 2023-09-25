@@ -8,18 +8,31 @@
 #include"singletons.hpp"
 
 // Not fixed
-void drawSquare(int x0, int y0, int x1, int y1) {
+int drawSquare(lua_State *L) {
+    int n = lua_gettop(L);
+    if (n != 4) {
+        lua_pushliteral(L, "Expected 4 arguments\n");
+        lua_error(L);
+        return 0;
+    }
+    for (int i = 1; i < 5; i++) {
+        if (!lua_isnumber(L, i)) {
+            lua_pushliteral(L, "Argument was supposed to be a number\n");
+            lua_error(L);
+            return 0;
+        }
+    }
     SDL_Rect rect;
-    rect.x = x0;
-    rect.y = y0;
-    rect.w = x1;
-    rect.h = y1;
+    rect.x = lua_tointeger(L, 1);
+    rect.y = lua_tointeger(L, 2);
+    rect.w = lua_tointeger(L, 3);
+    rect.h = lua_tointeger(L, 4);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, &rect);
     //std::cout << rect.x << rect.y << rect.w << rect.h << "\n";
+    return 0;
 }
 
-// Not fixed
 int getKey(lua_State *L)
 {
     int n = lua_gettop(L);
@@ -63,6 +76,6 @@ static int logMsg(lua_State *L)
 }
 
 void init_api() {
-    lua_register(L, "logMsg", logMsg);
+    lua_register(L, "drawSquare", drawSquare);
     lua_register(L, "getKey", getKey);
 }

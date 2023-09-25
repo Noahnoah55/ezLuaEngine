@@ -10,7 +10,6 @@
 SDL_Window *window;
 SDL_Renderer *renderer;
 lua_State *L;
-int a = 1;
 
 void init_lua() {
     L = luaL_newstate(); // Perhaps make my own allocater later?
@@ -43,13 +42,6 @@ void mainloop() {
     }
 
     lua_update();
-
-    // Set a color for drawing matching the earlier `ctx.fillStyle = "green"`.
-    SDL_SetRenderDrawColor(renderer, /* RGBA: green */ 0x00, 0x80, 0x00, 0xFF);
-    // Create and draw a rectangle like in the earlier `ctx.fillRect()`.
-    SDL_Rect rect = {.x = 10+a, .y = 10, .w = 150, .h = 100};
-    SDL_RenderFillRect(renderer, &rect);
-    a++;
 
     // Render everything from a buffer to the actual screen.
     SDL_RenderPresent(renderer);
