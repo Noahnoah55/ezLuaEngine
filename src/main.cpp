@@ -15,7 +15,13 @@ int a = 1;
 void init_lua() {
     L = luaL_newstate(); // Perhaps make my own allocater later?
     luaL_openlibs(L);
-    luaL_dostring(L, "function _update()\n\tlogMsg(\"Test!\")\nend");
+    init_api();
+    if (luaL_dofile(L, "game-code/main.lua") != 0) {
+        printf("Lua error: %s\n", lua_tostring(L, -1));
+    }
+    else {
+        printf("Lua initialized successfully\n");
+    }
 }
 
 void lua_update() {
@@ -55,7 +61,6 @@ int main() {
 
     SDL_CreateWindowAndRenderer(600,300,0,&window, &renderer);
     init_lua();
-    init_api();
     emscripten_set_main_loop(mainloop, 0, 1);
 
     SDL_Quit();

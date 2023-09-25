@@ -1,6 +1,5 @@
 CXX = em++
-CC = emcc
-CXXFLAGS = -s USE_SDL=2
+CXXFLAGS = -s USE_SDL=2 --preload-file $(GAME_CODE) -sNO_DISABLE_EXCEPTION_CATCHING
 BUILD = build
 SRC = src
 
@@ -12,7 +11,9 @@ LUA_A = liblua.a
 ENGINE = $(BUILD)/page.js
 PAGE = $(BUILD)/index.html
 
-all: $(ENGINE) $(PAGE) $(BUILD)/main.lua
+GAME_CODE = game-code
+
+all: $(ENGINE) $(PAGE)
 
 run: all
 	emrun $(PAGE)
@@ -20,7 +21,7 @@ run: all
 $(PAGE): $(SRC)/index.html $(BUILD)
 	cp $(SRC)/index.html $(PAGE)
 
-$(ENGINE): $(SRCS) $(BUILD) $(LUA_A)
+$(ENGINE): $(SRCS) $(BUILD) $(LUA_A) $(GAME_CODE)/*
 	$(CXX) $(LUA_A) $(SRCS) -o $(ENGINE) $(CXXFLAGS)
 
 $(LUA_A): $(LUA_SRC)
@@ -29,8 +30,6 @@ $(LUA_A): $(LUA_SRC)
 	emranlib $(LUA_A)
 	rm *.o
 
-$(BUILD)/main.lua: $(BUILD)
-	cp testgame/main.lua $(BUILD)/main.lua
 
 $(BUILD):
 	mkdir $(BUILD)
