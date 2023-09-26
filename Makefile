@@ -1,5 +1,7 @@
 CXX = em++
-CXXFLAGS = -s USE_SDL=2 --preload-file $(GAME_CODE) -sNO_DISABLE_EXCEPTION_CATCHING
+COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17
+LINKFLAGS = USE_SDL=2 -Ilua -Isol2/include --preload-file $(GAME_CODE)
+CXXFLAGS = -s $(LINKFLAGS) $(COMPILEFLAGS)
 BUILD = build
 SRC = src
 
@@ -25,7 +27,7 @@ $(ENGINE): $(SRCS) $(BUILD) $(LUA_A) $(GAME_CODE)/*
 	$(CXX) $(LUA_A) $(SRCS) -o $(ENGINE) $(CXXFLAGS)
 
 $(LUA_A): $(LUA_SRC)
-	$(CXX) $(LUA_SRC) -c
+	$(CXX) $(LUA_SRC) -c $(CXXFLAGS)
 	emar qc $(LUA_A) *.o
 	emranlib $(LUA_A)
 	rm *.o

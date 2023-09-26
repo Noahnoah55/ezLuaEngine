@@ -18,3 +18,5 @@ end
 x = 50
 y = 50
 spd = 3
+
+print("test!")

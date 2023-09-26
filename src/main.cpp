@@ -1,37 +1,26 @@
 #include<iostream>
 #include<emscripten.h>
 #include<SDL2/SDL.h>
-#include"../lua/lua.h"
-#include"../lua/lauxlib.h"
-#include"../lua/lualib.h"
-#include"api.hpp"
-#include"singletons.hpp"
+
+#include<lua.h>
+#include<lualib.h>
+#include<lauxlib.h>
+#include<sol/sol.hpp> // idk why but sol doesn't like to be included without lua already included
 
 SDL_Window *window;
 SDL_Renderer *renderer;
 lua_State *L;
+sol::state lua;
 
 void init_lua() {
-    L = luaL_newstate(); // Perhaps make my own allocater later?
-    luaL_openlibs(L);
-    init_api();
-    if (luaL_dofile(L, "game-code/main.lua") != 0) {
-        printf("Lua error: %s\n", lua_tostring(L, -1));
-    }
-    else {
-        printf("Lua initialized successfully\n");
-    }
+    lua.open_libraries(sol::lib::base);
+    lua.script_file("game-code/main.lua", [](lua_State *, sol::protected_function_result pfr) {
+        printf("Failed to load soltest!\n");
+        return pfr;
+    });
 }
 
 void lua_update() {
-    if (lua_getglobal(L, "_update") && lua_isfunction(L, -1)) {
-        if (lua_pcall(L, 0, 0, 0) != 0) {
-            std::cout << "Error running _update()\n";
-        }
-    }
-    else {
-        std::cout << "Could not find function _update()\n";
-    }
 }
 
 void mainloop() {
