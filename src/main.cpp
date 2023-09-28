@@ -9,18 +9,28 @@
 
 SDL_Window *window;
 SDL_Renderer *renderer;
-lua_State *L;
 sol::state lua;
 
+bool getKey(std::string keyname) {
+    auto scan  = SDL_GetScancodeFromName(keyname.c_str());
+    return SDL_GetKeyboardState(nullptr)[scan];
+}
+
+void drawSquare(int x, int y, int w, int h) {
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_Rect r = {.x=x, .y=y, .w=w, .h=h};
+    SDL_RenderFillRect(renderer, &r);
+}
+
 void init_lua() {
-    lua.open_libraries(sol::lib::base);
-    lua.script_file("game-code/main.lua", [](lua_State *, sol::protected_function_result pfr) {
-        printf("Failed to load soltest!\n");
-        return pfr;
-    });
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::math);
+    lua.script_file("game-code/main.lua");
+    lua.set_function("drawSquare", drawSquare);
+    lua.set_function("getKey", getKey);
 }
 
 void lua_update() {
+    lua.script("_update()\n");
 }
 
 void mainloop() {
