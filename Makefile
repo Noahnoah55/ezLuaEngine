@@ -1,6 +1,6 @@
 CXX = em++
 COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17
-LINKFLAGS = USE_SDL=2 -Ilua -Isol2/include --preload-file $(GAME_CODE)
+LINKFLAGS = USE_SDL=2 -Ilua -Isol2/include --preload-file $(GAME_FILES)
 CXXFLAGS = -s $(LINKFLAGS) $(COMPILEFLAGS)
 BUILD = build
 SRC = src
@@ -13,7 +13,7 @@ LUA_A = liblua.a
 ENGINE = $(BUILD)/page.js
 PAGE = $(BUILD)/index.html
 
-GAME_CODE = game-code
+GAME_FILES = game-files
 
 all: $(ENGINE) $(PAGE)
 

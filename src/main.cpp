@@ -10,6 +10,7 @@
 SDL_Window *window;
 SDL_Renderer *renderer;
 sol::state lua;
+sol::protected_function lua_update;
 
 bool getKey(std::string keyname) {
     auto scan  = SDL_GetScancodeFromName(keyname.c_str());
@@ -22,18 +23,27 @@ void drawSquare(int x, int y, int w, int h) {
     SDL_RenderFillRect(renderer, &r);
 }
 
-void init_lua() {
-    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::math);
-    lua.script_file("game-code/main.lua");
+bool init_lua() {
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::math, sol::lib::package);
+    lua.script(
+        R"(
+            function __handler (message)
+                print("[LUA-ERR]" .. message)
+            end
+        )");
+    auto pfr = lua.safe_script_file("game-files/src/main.lua", sol::script_pass_on_error);
+    if (!pfr.valid()) {
+        sol::error err = pfr;
+        std::cout << err.what() << "\n";
+        return false;
+    }
     lua.set_function("drawSquare", drawSquare);
     lua.set_function("getKey", getKey);
+    lua_update = sol::protected_function(lua["_update"], lua["__handler"]);
+    return true;
 }
 
-void lua_update() {
-    lua.script("_update()\n");
-}
-
-void mainloop() {
+void main_loop() {
     // Poll events
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
@@ -47,12 +57,12 @@ void mainloop() {
 }
 
 int main() {
-    std::cout << "Hello, world!\n";
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_CreateWindowAndRenderer(600,300,0,&window, &renderer);
-    init_lua();
-    emscripten_set_main_loop(mainloop, 0, 1);
+    if (init_lua()) {
+        emscripten_set_main_loop(main_loop, 0, 1);
+    }
 
     SDL_Quit();
     return 0;
