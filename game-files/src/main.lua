@@ -14,13 +14,10 @@ function _update()
     if getKey("d") then
         x = x + spd
     end
-    if getKey("Space") then
-        a
-    end
 
-    drawSquare(x, y, 10, 10)
+    drawRect(x, y, 10, 10)
     for k, v in pairs(particles) do
-        drawSquare(v.px, v.py, 10, 10)
+        drawRect(v.px, v.py, 10, 10)
         particles[k].px = v.vx + v.px
         particles[k].py = v.vy + v.py
     end
