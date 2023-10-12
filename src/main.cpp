@@ -8,9 +8,11 @@
 #include<sol/sol.hpp> 
 
 #include"api.hpp"
+#include"singletons.hpp"
 
 SDL_Window *window;
 SDL_Renderer *renderer;
+EZLUA_AssetStore ASSET_STORE;
 sol::state lua;
 sol::protected_function lua_update;
 

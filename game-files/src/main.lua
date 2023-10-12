@@ -15,7 +15,7 @@ function _update()
         x = x + spd
     end
 
-    drawRect(x, y, 10, 10)
+    drawImage("game-files/assets/ezle.png", x, y, 1, 1)
     for k, v in pairs(particles) do
         drawRect(v.px, v.py, 10, 10)
         particles[k].px = v.vx + v.px

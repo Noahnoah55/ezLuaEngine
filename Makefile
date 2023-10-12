@@ -1,7 +1,7 @@
 CXX = em++
 COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17
-LINKFLAGS = USE_SDL=2 -Ilua -Isol2/include --preload-file $(GAME_FILES)
-CXXFLAGS = -s $(LINKFLAGS) $(COMPILEFLAGS)
+LINKFLAGS = --use-preload-plugins -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -Ilua -Isol2/include --preload-file $(GAME_FILES)
+CXXFLAGS = $(LINKFLAGS) $(COMPILEFLAGS)
 BUILD = build
 SRC = src
 

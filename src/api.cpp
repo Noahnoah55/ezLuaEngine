@@ -8,15 +8,27 @@ bool get_key(std::string keyname) {
     return SDL_GetKeyboardState(nullptr)[scan];
 }
 
-void draw_rect(int x, int y, int w, int h) {
+void draw_rect(float x, float y, float w, float h) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_Rect r = {.x=x, .y=y, .w=w, .h=h};
-    SDL_RenderFillRect(renderer, &r);
+    SDL_FRect r = {.x=x, .y=y, .w=w, .h=h};
+    SDL_RenderFillRectF(renderer, &r);
+}
+
+void draw_image(std::string path, float x, float y, float wscale, float hscale) {
+    auto tex = ASSET_STORE.get_texture(path);
+    if (tex == NULL) {
+        std::cout << "[ERROR] Could not find texture at path " << path << "\n";
+    }
+    int w; int h;
+    auto res = SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+    SDL_FRect rect; rect.x=x; rect.y=y; rect.w=wscale*w; rect.h=hscale*h;
+    SDL_RenderCopyF(renderer, tex, NULL, &rect);
 }
 
 int init_api(sol::state &lua) {
     lua.set_function("drawRect", draw_rect);
     lua.set_function("getKey", get_key);
+    lua.set_function("drawImage", draw_image);
 
     return 0;
 }
