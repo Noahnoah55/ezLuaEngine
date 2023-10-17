@@ -2,6 +2,8 @@
 
 WIP web game engine using emscripten and LUA
 
+https://noahnoah55.github.io/ezLuaEngine/
+
 ## Building
 
 Currently only building for Linux, Windows builds coming next time I work on this at my PC
