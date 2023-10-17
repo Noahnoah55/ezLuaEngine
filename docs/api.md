@@ -14,9 +14,9 @@ Tests to see if the key at the position indicatd by the key name is pressed. Key
 
 ## Graphics
 
-### drawRect(x, y, width, height)
+### drawRect(x, y, width, height, {r, g, b})
 
-Draw a white rectangle starting from the top left at (x,y) with the given dimensions.
+Draw a rectangle starting from the top left at (x,y) with the given dimensions and color.
 
 ### drawImage(path, x, y, width_scale, height_scale)
 

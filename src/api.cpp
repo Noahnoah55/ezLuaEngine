@@ -8,8 +8,8 @@ bool get_key(std::string keyname) {
     return SDL_GetKeyboardState(nullptr)[scan];
 }
 
-void draw_rect(float x, float y, float w, float h) {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+void draw_rect(float x, float y, float w, float h, sol::table color) {
+    SDL_SetRenderDrawColor(renderer, color[1], color[2], color[3], 255);
     SDL_FRect r = {.x=x, .y=y, .w=w, .h=h};
     SDL_RenderFillRectF(renderer, &r);
 }

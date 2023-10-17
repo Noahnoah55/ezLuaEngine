@@ -2,7 +2,7 @@
 
 WIP web game engine using emscripten and LUA
 
-https://noahnoah55.github.io/ezLuaEngine/
+<https://noahnoah55.github.io/ezLuaEngine/>
 
 ## Building
 
