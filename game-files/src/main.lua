@@ -14,15 +14,18 @@ function _update()
     if getKey("d") then
         x = x + spd
     end
+    if getKey("j") then
+        scale = scale * 1.1
+    end
+    if getKey("k") then
+        scale = scale * .9
+    end
 
     drawRect(x-1,y-1, 18, 18, {255, x, y})
-    drawImage("game-files/assets/ezle.png", x, y, 1, 1)
-    for k, v in pairs(particles) do
-        drawRect(v.px, v.py, 10, 10)
-        particles[k].px = v.vx + v.px
-        particles[k].py = v.vy + v.py
-    end
+    drawImage("game-files/assets/ezle.png", x, y, scale, scale)
+    drawLine(0,0,x,y,{255,255,255})
 end
+scale = 1
 
 x = 50
 y = 50

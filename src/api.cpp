@@ -25,10 +25,16 @@ void draw_image(std::string path, float x, float y, float wscale, float hscale) 
     SDL_RenderCopyF(renderer, tex, NULL, &rect);
 }
 
+void draw_line(float x1, float y1, float x2, float y2, sol::table color) {
+    SDL_SetRenderDrawColor(renderer, color[1], color[2], color[3], 255);
+    SDL_RenderDrawLineF(renderer, x1, y1, x2, y2);
+}
+
 int init_api(sol::state &lua) {
     lua.set_function("drawRect", draw_rect);
     lua.set_function("getKey", get_key);
     lua.set_function("drawImage", draw_image);
+    lua.set_function("drawLine", draw_line);
 
     return 0;
 }
