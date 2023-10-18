@@ -2,9 +2,6 @@
 #include<emscripten.h>
 #include<SDL2/SDL.h>
 
-#include<lua.h>
-#include<lualib.h>
-#include<lauxlib.h>
 #include<sol/sol.hpp> 
 
 #include"api.hpp"

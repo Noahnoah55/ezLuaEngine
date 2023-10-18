@@ -1,7 +1,9 @@
 CXX = em++
-COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17
-LINKFLAGS = --use-preload-plugins -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -Ilua -Isol2/include --preload-file $(GAME_FILES)
-CXXFLAGS = $(LINKFLAGS) $(COMPILEFLAGS)
+CC = emcc
+C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING
+CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17
+LINKFLAGS = --use-preload-plugins -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -Ilua -Isol2/include --preload-file $(GAME_FILES) --emrun
+CXXFLAGS = $(LINKFLAGS) $(CXX_COMPILEFLAGS)
 BUILD = build
 SRC = src
 
@@ -27,7 +29,7 @@ $(ENGINE): $(SRCS) $(BUILD) $(LUA_A) $(GAME_CODE)/*
 	$(CXX) $(LUA_A) $(SRCS) -o $(ENGINE) $(CXXFLAGS)
 
 $(LUA_A): $(LUA_SRC)
-	$(CXX) $(LUA_SRC) -c $(CXXFLAGS)
+	$(CC) $(LUA_SRC) -c $(C_COMPILEFLAGS)
 	emar qc $(LUA_A) *.o
 	emranlib $(LUA_A)
 	rm *.o
