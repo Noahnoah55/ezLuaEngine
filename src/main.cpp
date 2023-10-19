@@ -50,6 +50,7 @@ void main_loop() {
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
 
     SDL_CreateWindowAndRenderer(600,300,0,&window, &renderer);
     if (init_lua()) {

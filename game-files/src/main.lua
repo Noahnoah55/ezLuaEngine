@@ -24,6 +24,7 @@ function _update()
     drawRect(x-1,y-1, 18, 18, {255, x, y})
     drawImage("game-files/assets/ezle.png", x, y, scale, scale)
     drawLine(0,0,x,y,{255,255,255})
+    drawText("Hello world!", 600-x, 300-y, 25, {255, 255, 255}, "default-assets/Roboto/Roboto-Regular.ttf")
 end
 scale = 1
 

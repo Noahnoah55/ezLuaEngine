@@ -1,5 +1,7 @@
 #include<SDL2/SDL.h>
+#include<SDL2/SDL_ttf.h>
 #include<string>
+#include<iostream>
 #include"api.hpp"
 #include"singletons.hpp"
 
@@ -30,11 +32,30 @@ void draw_line(float x1, float y1, float x2, float y2, sol::table color) {
     SDL_RenderDrawLineF(renderer, x1, y1, x2, y2);
 }
 
+// These are drawn every time this function is called, should be fine for now
+void draw_text(std::string text, float x, float y, int ptsize, sol::table color, std::string fpath) {
+    auto font = ASSET_STORE.get_font(fpath, ptsize);
+    SDL_Color sdlc; sdlc.r=color[1]; sdlc.g=color[2]; sdlc.b=color[3];
+    if (font == nullptr) {
+        std::cerr << "[Error] Could not find font at path " << fpath << "\n";
+        return;
+    }
+    auto surf = TTF_RenderText_Solid(font, text.c_str(), sdlc);
+    auto tex = SDL_CreateTextureFromSurface(renderer, surf);
+    int w; int h;
+    auto res = SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+    SDL_FRect drect; drect.x=x; drect.y=y; drect.w=w; drect.h=h;
+    SDL_RenderCopyF(renderer, tex, NULL, &drect);
+    SDL_FreeSurface(surf);
+    SDL_DestroyTexture(tex);
+}
+
 int init_api(sol::state &lua) {
     lua.set_function("drawRect", draw_rect);
     lua.set_function("getKey", get_key);
     lua.set_function("drawImage", draw_image);
     lua.set_function("drawLine", draw_line);
+    lua.set_function("drawText", draw_text);
 
     return 0;
 }

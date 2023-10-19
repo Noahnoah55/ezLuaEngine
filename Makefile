@@ -2,7 +2,7 @@ CXX = em++
 CC = emcc
 C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING
 CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17
-LINKFLAGS = --use-preload-plugins -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -Ilua -Isol2/include --preload-file $(GAME_FILES) --emrun
+LINKFLAGS = --use-preload-plugins -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -Ilua -Isol2/include --preload-file $(GAME_FILES) --preload-file default-assets --emrun
 CXXFLAGS = $(LINKFLAGS) $(CXX_COMPILEFLAGS)
 BUILD = build
 SRC = src
