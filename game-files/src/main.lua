@@ -5,7 +5,7 @@ function _update()
     if t == 0 then
         playMusic("default-assets/snd/title3.ogg")
     end
-    t = 1
+    t = t + 1
     if getKey("w") then
         y = y - spd
     end
@@ -32,6 +32,7 @@ function _update()
     drawImage("game-files/assets/ezle.png", x, y, scale, scale)
     drawLine(0,0,x,y,{255,255,255})
     drawText("Hello world!", 600-x, 300-y, 25, {255, 255, 255}, "default-assets/Roboto/Roboto-Regular.ttf")
+    drawText("t = " .. tostring(t), 10, 0, 25, {255, 255, 255}, "default-assets/Roboto/Roboto-Regular.ttf")
 end
 t = 0
 

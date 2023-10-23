@@ -69,12 +69,26 @@ void draw_text(std::string text, float x, float y, int ptsize, sol::table color,
 }
 
 // SOUND
+void play_sound_vol(std::string path, int vol) {
+    auto chunk = ASSET_STORE.get_chunk(path);
+    Mix_VolumeChunk(chunk, vol);
+    Mix_PlayChannel(-1, chunk, 0);
+}
+
 void play_sound(std::string path) {
-    Mix_PlayChannel(-1, ASSET_STORE.get_chunk(path), 0);
+    play_sound_vol(path, MIX_MAX_VOLUME);
 }
 
 void play_music(std::string path) {
     Mix_PlayMusic(ASSET_STORE.get_music(path), 0);
+}
+
+bool music_playing() {
+    return Mix_PlayingMusic();
+}
+
+bool music_paused() {
+    return Mix_PausedMusic();
 }
 
 int init_api(sol::state &lua) {
@@ -86,8 +100,13 @@ int init_api(sol::state &lua) {
     lua.set_function("drawLine", draw_line);
     lua.set_function("drawText", draw_text);
 
-    lua.set_function("playSound", play_sound);
+    lua.set_function("playSound", sol::overload(play_sound, play_sound_vol));
     lua.set_function("playMusic", play_music);
+    lua.set_function("musicPlaying", music_playing);
+    lua.set_function("musicPaused", music_paused);
+    lua.set_function("pauseMusic", Mix_PauseMusic);
+    lua.set_function("resumeMusic", Mix_ResumeMusic);
+    lua.set_function("setMusicVol", Mix_VolumeMusic);
 
     return 0;
 }
