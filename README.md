@@ -8,12 +8,15 @@ WIP web game engine using emscripten and LUA
 
 Currently only building for Linux, Windows builds coming next time I work on this at my PC
 
-First load emsdk with
+After cloning the repository, populate the submodule directories with
+```git submodule update --init```
+
+Then load the included emsdk to your path with
 ```source configure```
 
-Then
+Finally, build the engine and host the demo game with
 ```make run```
 
-The engine will attempt to read `main.lua` from the build folder, so put any behavior in that file.
+The engine starts by loading ```game-files/src/main.lua```, and will call ```_update()``` every frame
 
-Better instructions coming when the API is more fleshed out
+API reference is unfinished, but all lua functions are defined in ```src/api.c```
