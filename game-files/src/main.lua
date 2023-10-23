@@ -20,6 +20,9 @@ function _update()
     if getKey("k") then
         scale = scale * .9
     end
+    if getKeyJustPressed("space") then
+        playSound("default-assets/snd/pluck.wav")
+    end
 
     drawRect(x-1,y-1, 18, 18, {255, x, y})
     drawImage("game-files/assets/ezle.png", x, y, scale, scale)

@@ -2,6 +2,7 @@
 #include "singletons.hpp"
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
+#include<SDL2/SDL_mixer.h>
 #include<iostream>
 
 SDL_Texture* EZLUA_AssetStore::get_texture(std::string path)
@@ -30,14 +31,26 @@ TTF_Font *EZLUA_AssetStore::get_font(std::string path, int ptsize)
         SDL_ClearError();
         TTF_Font* font = TTF_OpenFont(path.c_str(), ptsize);
         if (font == NULL) {
-            auto c = SDL_GetError();
             auto t = TTF_GetError();
-            std::cout << c << '\n';
             std::cout << t << '\n';
             return nullptr;
         }
         this->fonts[query] = font;
-        std::cout << "New Entry\n";
         return font;
     }
 };
+
+Mix_Chunk *EZLUA_AssetStore::get_chunk(std::string path) {
+    if (this->chunks.find(path) != this->chunks.end()) {
+        return this->chunks.at(path);
+    }
+    else {
+        Mix_Chunk *c = Mix_LoadWAV(path.c_str());
+        if (c == nullptr) {
+            std::cout << Mix_GetError() << "\n";
+            return c;
+        }
+        this->chunks[path] = c;
+        return c;
+    }
+}

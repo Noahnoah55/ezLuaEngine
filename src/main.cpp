@@ -1,6 +1,8 @@
 #include<iostream>
 #include<emscripten.h>
 #include<SDL2/SDL.h>
+#include<SDL2/SDL_mixer.h>
+#include<SDL2/SDL_ttf.h>
 
 #include<sol/sol.hpp> 
 
@@ -13,6 +15,7 @@ EZLUA_AssetStore ASSET_STORE;
 sol::state lua;
 sol::protected_function lua_update;
 
+Uint8 lastKeystate[SDL_NUM_SCANCODES] = {0};
 
 bool init_lua() {
     lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::math, sol::lib::package);
@@ -44,15 +47,32 @@ void main_loop() {
 
     lua_update();
 
+    memcpy(lastKeystate, SDL_GetKeyboardState(NULL), sizeof(lastKeystate));
+
     // Render everything from a buffer to the actual screen.
     SDL_RenderPresent(renderer);
 }
 
 int main() {
-    SDL_Init(SDL_INIT_VIDEO);
-    TTF_Init();
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+        std::cout << "SDL failed to initialize, error: " << SDL_GetError() << "\n";
+        return -1;
+    }
 
-    SDL_CreateWindowAndRenderer(600,300,0,&window, &renderer);
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
+        std::cout << "SDL_mixer failed to initialize, error: " << Mix_GetError() << "\n";
+        return -1;
+    }
+
+    if (TTF_Init() != 0) {
+        std::cout << "SDL_ttf failed to initialize, error: " << TTF_GetError() << "\n";
+        return -1;
+    }
+
+    if (SDL_CreateWindowAndRenderer(600,300,0,&window, &renderer) != 0) {
+        std::cout << "SDL failed to create a window, error: " << SDL_GetError() << "\n";
+    }
+
     if (init_lua()) {
         emscripten_set_main_loop(main_loop, 0, 1);
     }
