@@ -73,6 +73,10 @@ void play_sound(std::string path) {
     Mix_PlayChannel(-1, ASSET_STORE.get_chunk(path), 0);
 }
 
+void play_music(std::string path) {
+    Mix_PlayMusic(ASSET_STORE.get_music(path), 0);
+}
+
 int init_api(sol::state &lua) {
     lua.set_function("getKey", get_key);
     lua.set_function("getKeyJustPressed", get_key_just_pressed);
@@ -83,6 +87,7 @@ int init_api(sol::state &lua) {
     lua.set_function("drawText", draw_text);
 
     lua.set_function("playSound", play_sound);
+    lua.set_function("playMusic", play_music);
 
     return 0;
 }

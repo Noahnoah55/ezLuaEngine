@@ -54,3 +54,18 @@ Mix_Chunk *EZLUA_AssetStore::get_chunk(std::string path) {
         return c;
     }
 }
+
+Mix_Music *EZLUA_AssetStore::get_music(std::string path) {
+    if (this->musics.find(path) != this->musics.end()) {
+        return this->musics.at(path);
+    }
+    else {
+        Mix_Music *m = Mix_LoadMUS(path.c_str());
+        if (m == nullptr) {
+            std::cout << Mix_GetError() << "\n";
+            return m;
+        }
+        this->musics[path] = m;
+        return m;
+    }
+}

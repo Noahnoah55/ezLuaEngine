@@ -2,6 +2,10 @@ package.path = "game-files/src/?.lua;" .. package.path
 require("two")
 
 function _update()
+    if t == 0 then
+        playMusic("default-assets/snd/title3.ogg")
+    end
+    t = 1
     if getKey("w") then
         y = y - spd
     end
@@ -29,6 +33,8 @@ function _update()
     drawLine(0,0,x,y,{255,255,255})
     drawText("Hello world!", 600-x, 300-y, 25, {255, 255, 255}, "default-assets/Roboto/Roboto-Regular.ttf")
 end
+t = 0
+
 scale = 1
 
 x = 50
