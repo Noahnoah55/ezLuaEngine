@@ -1,31 +1,30 @@
-CXX = em++
-CC = emcc
-C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING
-CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17
-LINKFLAGS = --use-preload-plugins -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 -Ilua -Isol2/include --preload-file $(GAME_FILES) --preload-file default-assets --emrun
-CXXFLAGS = $(LINKFLAGS) $(CXX_COMPILEFLAGS)
 BUILD = build
 SRC = src
-
 SRCS = $(SRC)/*.cpp
+HTML = $(SRC)/shell.html
+
+CXX = em++
+CC = emcc
+C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -g
+CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17 -g
+LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 -Ilua -Isol2/include --emrun --shell-file $(HTML)
+CXXFLAGS = $(LINKFLAGS) $(CXX_COMPILEFLAGS)
+
 
 LUA_SRC = $(shell ls ./lua/*.c | grep -v "luac.c" | grep -v "lua.c" | tr "\n" " ")
 LUA_A = liblua.a
 
-ENGINE = $(BUILD)/page.js
-PAGE = $(BUILD)/index.html
+ENGINE = $(BUILD)/game.html
 
 GAME_FILES = game-files
 
-all: $(ENGINE) $(PAGE)
+all: $(ENGINE)
 
-run: all
-	emrun $(PAGE)
+run-sample: all
+	cp -r examples/hello-world/* build/
+	emrun $(ENGINE)
 
-$(PAGE): $(SRC)/index.html $(BUILD)
-	cp $(SRC)/index.html $(PAGE)
-
-$(ENGINE): $(SRCS) $(BUILD) $(LUA_A) $(GAME_CODE)/*
+$(ENGINE): $(SRCS) $(LUA_A) $(BUILD) $(HTML)
 	$(CXX) $(LUA_A) $(SRCS) -o $(ENGINE) $(CXXFLAGS)
 
 $(LUA_A): $(LUA_SRC)

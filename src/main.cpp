@@ -1,5 +1,6 @@
 #include<iostream>
 #include<emscripten.h>
+#include<emscripten/fetch.h>
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_mixer.h>
 #include<SDL2/SDL_ttf.h>
@@ -8,6 +9,9 @@
 
 #include"api.hpp"
 #include"singletons.hpp"
+#include"fetch.hpp"
+
+int download_done = 0;
 
 SDL_Window *window;
 SDL_Renderer *renderer;
@@ -25,7 +29,7 @@ bool init_lua() {
                 print("[LUA-ERR]" .. message)
             end
         )");
-    auto pfr = lua.safe_script_file("game-files/src/main.lua", sol::script_pass_on_error);
+    auto pfr = lua.safe_script_file("/main.lua", sol::script_pass_on_error);
     if (!pfr.valid()) {
         sol::error err = pfr;
         std::cout << err.what() << "\n";
@@ -41,7 +45,8 @@ void main_loop() {
     SDL_RenderClear(renderer);
     // Poll events
     SDL_Event e;
-    while (SDL_PollEvent(&e)) {
+    while (SDL_PollEvent(&e))
+    {
         // Maybe useful later? At least this will still pump events
     }
 
@@ -53,7 +58,28 @@ void main_loop() {
     SDL_RenderPresent(renderer);
 }
 
+void download_loop() {
+    if (download_done == 1) {
+        init_lua();
+        printf("done?\n");
+        download_done = 2;
+        return;
+    }
+    if (download_done == 2) {
+        main_loop();
+        return;
+    }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_Event e;
+    while (SDL_PollEvent(&e)) {
+
+    }
+    SDL_RenderPresent(renderer);
+}
+
 int main() {
+    download_file_to_FS("src/main.lua");
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
         std::cout << "SDL failed to initialize, error: " << SDL_GetError() << "\n";
         return -1;
@@ -73,9 +99,7 @@ int main() {
         std::cout << "SDL failed to create a window, error: " << SDL_GetError() << "\n";
     }
 
-    if (init_lua()) {
-        emscripten_set_main_loop(main_loop, 0, 1);
-    }
+    emscripten_set_main_loop(download_loop, 0, 1);
 
     SDL_Quit();
     return 0;
