@@ -79,6 +79,7 @@ void download_loop() {
 }
 
 int main() {
+    init_filesystem();
     download_file_to_FS("src/main.lua");
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
         std::cout << "SDL failed to initialize, error: " << SDL_GetError() << "\n";

@@ -1,14 +1,15 @@
 BUILD = build
 SRC = src
-SRCS = $(SRC)/*.cpp
+SRCS = $(wildcard $(SRC)/*.cpp)
+HEADERS = $(wildcard $(SRC)/*.hpp)
+OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 HTML = $(SRC)/shell.html
 
 CXX = em++
 CC = emcc
-C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -g
-CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17 -g
-LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 -Ilua -Isol2/include --emrun --shell-file $(HTML)
-CXXFLAGS = $(LINKFLAGS) $(CXX_COMPILEFLAGS)
+C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -g -pthread
+CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17 -g -pthread -Ilua -Isol2/include
+LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 --emrun --shell-file $(HTML)
 
 
 LUA_SRC = $(shell ls ./lua/*.c | grep -v "luac.c" | grep -v "lua.c" | tr "\n" " ")
@@ -24,8 +25,12 @@ run-sample: all
 	cp -r examples/hello-world/* build/
 	emrun $(ENGINE)
 
-$(ENGINE): $(SRCS) $(LUA_A) $(BUILD) $(HTML)
-	$(CXX) $(LUA_A) $(SRCS) -o $(ENGINE) $(CXXFLAGS)
+$(ENGINE): $(OBJS) $(LUA_A) $(HTML)
+	mkdir -p $(BUILD)
+	$(CXX) $(LUA_A) $(OBJS) -o $(ENGINE) $(LINKFLAGS)
+
+$(OBJS): %.o : %.cpp $(HEADERS)
+	$(CXX) -c $(CXX_COMPILEFLAGS) $< -o $@
 
 $(LUA_A): $(LUA_SRC)
 	$(CC) $(LUA_SRC) -c $(C_COMPILEFLAGS)
@@ -33,11 +38,8 @@ $(LUA_A): $(LUA_SRC)
 	emranlib $(LUA_A)
 	rm *.o
 
-
-$(BUILD):
-	mkdir $(BUILD)
-
 clean:
 	rm -rf build
 	rm -rf *.o
+	rm -rf $(SRC)/*.o
 	rm -rf *.a
