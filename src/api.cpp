@@ -58,7 +58,7 @@ void draw_text(std::string text, float x, float y, int ptsize, sol::table color,
         std::cerr << "[Error] Could not find font at path " << fpath << "\n";
         return;
     }
-    auto surf = TTF_RenderText_Solid(font, text.c_str(), sdlc);
+    auto surf = TTF_RenderText_Blended(font, text.c_str(), sdlc);
     auto tex = SDL_CreateTextureFromSurface(renderer, surf);
     int w; int h;
     auto res = SDL_QueryTexture(tex, NULL, NULL, &w, &h);
