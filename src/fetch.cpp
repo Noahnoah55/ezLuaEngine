@@ -17,11 +17,9 @@ std::mutex fset_mut;
 
 void save_to_FS(emscripten_fetch_t *fetch) {
     printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
-    //printf("----FILE----\n%.*s\n----EOF----\n", (int)fetch->numBytes, fetch->data);
 
     auto path = std::filesystem::path(fetch->url);
     if (!std::filesystem::exists(path.parent_path())) {
-        printf("making dir %s\n", path.parent_path().string().c_str());
         std::filesystem::create_directories(path.parent_path());
     }
     auto f = std::ofstream(path);

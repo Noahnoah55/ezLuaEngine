@@ -31,7 +31,6 @@ TTF_Font *EZLUA_AssetStore::get_font(std::string path, int ptsize)
     else {
         SDL_ClearError();
         TTF_Font* font = TTF_OpenFont(path.c_str(), ptsize);
-        printf("{%s}\n", path.c_str());
         if (font == NULL) {
             auto t = TTF_GetError();
             std::cout << t << '\n';
