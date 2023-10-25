@@ -21,6 +21,6 @@ Then load the included emsdk to your path with
 Finally, build the engine and host the demo game with
 ```make run```
 
-The engine starts by loading ```game-files/src/main.lua```, and will call ```_update()``` every frame
+The engine starts by loading ```src/main.lua```, and will call ```_update()``` every frame
 
 API reference is unfinished, but all lua functions are defined in ```src/api.c```
