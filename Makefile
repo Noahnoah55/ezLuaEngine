@@ -4,6 +4,8 @@ SRCS = $(wildcard $(SRC)/*.cpp)
 HEADERS = $(wildcard $(SRC)/*.hpp)
 OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 HTML = $(SRC)/shell.html
+COPY = $(wildcard $(SRC)/copy/*)
+COPY_DEST = $(patsubst $(SRC)/copy/%,$(BUILD)/%,$(COPY))
 
 CXX = em++
 CC = emcc
@@ -19,7 +21,7 @@ ENGINE = $(BUILD)/game.html
 
 GAME_FILES = game-files
 
-all: $(ENGINE)
+all: $(ENGINE) $(COPY_DEST)
 
 run: all
 	cp -r examples/hello-world/* build/
@@ -30,6 +32,10 @@ run: all
 $(ENGINE): $(OBJS) $(LUA_A) $(HTML)
 	mkdir -p $(BUILD)
 	$(CXX) $(LUA_A) $(OBJS) -o $(ENGINE) $(LINKFLAGS)
+
+$(COPY_DEST): $(BUILD)/% : $(SRC)/copy/% $(COPY)
+	mkdir -p $(BUILD)
+	cp $< $@
 
 $(OBJS): %.o : %.cpp $(HEADERS)
 	$(CXX) -c $(CXX_COMPILEFLAGS) $< -o $@
