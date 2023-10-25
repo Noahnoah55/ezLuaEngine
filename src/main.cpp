@@ -110,7 +110,7 @@ int main() {
         return -1;
     }
     
-    int img_flags = 0;
+    int img_flags = IMG_INIT_PNG;
 
     if (IMG_Init(img_flags) != img_flags) {
         std::cout << "SDL_Image failed to initialize, error: " << IMG_GetError() << "\n";

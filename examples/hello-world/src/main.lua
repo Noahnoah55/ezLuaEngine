@@ -26,7 +26,7 @@ function _update()
     end
 
     drawRect(x-1,y-1, 18, 18, {255, x, y})
-    drawImage("assets/ezle.bmp", x, y, scale, scale)
+    drawImage("assets/ezle.png", x, y, scale, scale)
     drawLine(0,0,x,y,{255,255,255})
     drawText("Hello world!", 600-x, 300-y, 25, {255, 255, 255}, "assets/Roboto/Roboto-Regular.ttf")
     drawText("t = " .. tostring(t), 10, 0, 25, {255, 255, 255}, "assets/Roboto/Roboto-Regular.ttf")

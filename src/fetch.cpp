@@ -41,19 +41,10 @@ void report_download_error(emscripten_fetch_t *fetch) {
     emscripten_fetch_close(fetch);
 }
 
-void *_init_filesystem(void *a) {
-    emscripten_fetch_attr_t includeAttr;
-    emscripten_fetch_attr_init(&includeAttr);
-    strcpy(includeAttr.requestMethod, "GET");
-    includeAttr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS;
-    includeAttr.onerror = report_download_error;
-    auto f = emscripten_fetch(&includeAttr, "include.txt");
-    if (f->status != 200) {
-        pthread_exit(NULL);
-    }
+void _init_filesystem(emscripten_fetch_t *fetch) {
 
     std::string include;
-    include.append(f->data, f->numBytes);
+    include.append(fetch->data, fetch->numBytes);
 
     emscripten_fetch_attr_t attr;
     emscripten_fetch_attr_init(&attr);
@@ -73,10 +64,15 @@ void *_init_filesystem(void *a) {
     }
     while (pos < include.length());
     GAME_PHASE = DOWNLOAD_STARTED;
-    return NULL;
+    return;
 }
 
 void init_filesystem() {
-    pthread_t dl;
-    pthread_create(&dl, NULL, _init_filesystem, NULL);
+    emscripten_fetch_attr_t includeAttr;
+    emscripten_fetch_attr_init(&includeAttr);
+    strcpy(includeAttr.requestMethod, "GET");
+    includeAttr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+    includeAttr.onerror = report_download_error;
+    includeAttr.onsuccess = _init_filesystem;
+    emscripten_fetch(&includeAttr, "include.txt");
 }
