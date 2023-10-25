@@ -67,7 +67,6 @@ void main_loop() {
 void download_loop() {
     if (GAME_PHASE == DOWNLOAD_FINISHED) {
         init_lua();
-        printf("done?\n");
         GAME_PHASE = GAME_RUNNING;
         return;
     }
