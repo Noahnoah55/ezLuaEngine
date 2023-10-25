@@ -1,22 +1,28 @@
 #include"fetch.hpp"
+#include"singletons.hpp"
 
 #include<emscripten/fetch.h>
 #include<string>
 #include<vector>
 #include<cstring>
 #include<cstdio>
-#include"singletons.hpp"
+
+#include<filesystem>
+#include<fstream>
 
 void save_to_FS(emscripten_fetch_t *fetch) {
     printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
     //printf("----FILE----\n%.*s\n----EOF----\n", (int)fetch->numBytes, fetch->data);
-    auto file = fopen("/main.lua", "w");
-    if (file != NULL) {
-        fwrite(fetch->data, sizeof(char), fetch->numBytes, file);
-        fclose(file);
+
+    auto path = std::filesystem::path(fetch->url);
+    if (!std::filesystem::exists(path.parent_path())) {
+        std::filesystem::create_directories(path.parent_path());
     }
-    else {
-        printf("Failed to open %s\n", fetch->url);
+    auto f = std::ofstream(path);
+    f.write(fetch->data, fetch->numBytes);
+    f.close();
+    if (f.fail()) {
+        printf("Failed to copy file %s to %s\n", fetch->url, path.string().c_str());
     }
     emscripten_fetch_close(fetch);
 }
@@ -51,7 +57,6 @@ void *_init_filesystem(void *a) {
 
     std::string include;
     include.append(f->data, f->numBytes);
-    printf("%s",include.c_str());
 
     emscripten_fetch_attr_t attr;
     emscripten_fetch_attr_init(&attr);
@@ -61,11 +66,16 @@ void *_init_filesystem(void *a) {
     attr.onsuccess = save_to_FS;
     std::vector<std::string> lines;
     int pos = 0;
-    int newpos = include.find('\n', pos);
-
-    printf("%d, %d, %d\n", pos, newpos, (int)include.length());
+    int newpos = 0;
+    do {
+        newpos = include.find('\n', pos);
+        auto s = include.substr(pos, newpos-pos);
+        emscripten_fetch(&attr, s.c_str());
+        pos = newpos+1;
+    }
+    while (pos < include.length());
     
-    pthread_exit(NULL);
+    return NULL;
 }
 
 void init_filesystem() {

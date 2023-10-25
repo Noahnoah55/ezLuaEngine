@@ -9,7 +9,7 @@ CXX = em++
 CC = emcc
 C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -g -pthread
 CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17 -g -pthread -Ilua -Isol2/include
-LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 --emrun --shell-file $(HTML)
+LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 --emrun --shell-file $(HTML) -pthread
 
 
 LUA_SRC = $(shell ls ./lua/*.c | grep -v "luac.c" | grep -v "lua.c" | tr "\n" " ")
@@ -21,8 +21,10 @@ GAME_FILES = game-files
 
 all: $(ENGINE)
 
-run-sample: all
+run: all
 	cp -r examples/hello-world/* build/
+	cd build; \
+		find assets/ src/ -type f > include.txt
 	emrun $(ENGINE)
 
 $(ENGINE): $(OBJS) $(LUA_A) $(HTML)
