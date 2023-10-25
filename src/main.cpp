@@ -1,9 +1,12 @@
 #include<iostream>
+#include<set>
+#include<mutex>
 #include<emscripten.h>
 #include<emscripten/fetch.h>
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_mixer.h>
 #include<SDL2/SDL_ttf.h>
+#include<SDL2/SDL_image.h>
 
 #include<sol/sol.hpp> 
 
@@ -11,7 +14,10 @@
 #include"singletons.hpp"
 #include"fetch.hpp"
 
-int download_done = 0;
+
+int last = 0;
+
+PHASE GAME_PHASE = DOWNLOAD_NOT_STARTED;
 
 SDL_Window *window;
 SDL_Renderer *renderer;
@@ -29,7 +35,7 @@ bool init_lua() {
                 print("[LUA-ERR]" .. message)
             end
         )");
-    auto pfr = lua.safe_script_file("/main.lua", sol::script_pass_on_error);
+    auto pfr = lua.safe_script_file("/src/main.lua", sol::script_pass_on_error);
     if (!pfr.valid()) {
         sol::error err = pfr;
         std::cout << err.what() << "\n";
@@ -59,13 +65,13 @@ void main_loop() {
 }
 
 void download_loop() {
-    if (download_done == 1) {
+    if (GAME_PHASE == DOWNLOAD_FINISHED) {
         init_lua();
         printf("done?\n");
-        download_done = 2;
+        GAME_PHASE = GAME_RUNNING;
         return;
     }
-    if (download_done == 2) {
+    if (GAME_PHASE == GAME_RUNNING) {
         main_loop();
         return;
     }
@@ -76,6 +82,16 @@ void download_loop() {
 
     }
     SDL_RenderPresent(renderer);
+    if (GAME_PHASE == DOWNLOAD_STARTED) {
+        std::lock_guard<std::mutex> l(fset_mut);
+        if (fset.size() != last) {
+            printf("Remaining files: %d\n", (int)fset.size());
+            if (fset.size() == 0) {
+                GAME_PHASE = DOWNLOAD_FINISHED;
+            }
+            last = fset.size();
+        }
+    }
 }
 
 int main() {
@@ -92,6 +108,13 @@ int main() {
 
     if (TTF_Init() != 0) {
         std::cout << "SDL_ttf failed to initialize, error: " << TTF_GetError() << "\n";
+        return -1;
+    }
+    
+    int img_flags = 0;
+
+    if (IMG_Init(img_flags) != img_flags) {
+        std::cout << "SDL_Image failed to initialize, error: " << IMG_GetError() << "\n";
         return -1;
     }
 

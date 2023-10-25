@@ -9,7 +9,7 @@ CXX = em++
 CC = emcc
 C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -g -pthread
 CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17 -g -pthread -Ilua -Isol2/include
-LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 --emrun --shell-file $(HTML) -pthread
+LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sSDL2_IMAGE_FORMATS='["BMP"]' -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 --emrun --shell-file $(HTML) -pthread
 
 
 LUA_SRC = $(shell ls ./lua/*.c | grep -v "luac.c" | grep -v "lua.c" | tr "\n" " ")

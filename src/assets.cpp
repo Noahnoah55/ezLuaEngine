@@ -13,6 +13,7 @@ SDL_Texture* EZLUA_AssetStore::get_texture(std::string path)
     else {
         SDL_Surface* surf = IMG_Load(path.c_str());
         if (surf == NULL) {
+            std::cout << IMG_GetError() << "\n";
             return NULL;
         }
         SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
@@ -30,6 +31,7 @@ TTF_Font *EZLUA_AssetStore::get_font(std::string path, int ptsize)
     else {
         SDL_ClearError();
         TTF_Font* font = TTF_OpenFont(path.c_str(), ptsize);
+        printf("{%s}\n", path.c_str());
         if (font == NULL) {
             auto t = TTF_GetError();
             std::cout << t << '\n';
