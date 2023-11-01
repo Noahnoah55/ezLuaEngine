@@ -1,6 +1,4 @@
 #include"fetch.hpp"
-#include"singletons.hpp"
-
 #include<emscripten/fetch.h>
 #include<string>
 #include<vector>
@@ -63,7 +61,6 @@ void _init_filesystem(emscripten_fetch_t *fetch) {
         pos = newpos+1;
     }
     while (pos < include.length());
-    GAME_PHASE = DOWNLOAD_STARTED;
     return;
 }
 

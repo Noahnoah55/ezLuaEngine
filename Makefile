@@ -4,14 +4,12 @@ SRCS = $(wildcard $(SRC)/*.cpp)
 HEADERS = $(wildcard $(SRC)/*.hpp)
 OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 HTML = $(SRC)/shell.html
-COPY = $(wildcard $(SRC)/copy/*)
-COPY_DEST = $(patsubst $(SRC)/copy/%,$(BUILD)/%,$(COPY))
 
 CXX = em++
 CC = emcc
-C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -g
-CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17 -g -Ilua -Isol2/include
-LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sSDL2_IMAGE_FORMATS='["bmp", "png"]' -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 --emrun --shell-file $(HTML)
+C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -g3
+CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17 -g -Ilua -Isol2/include -g3
+LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sSDL2_IMAGE_FORMATS='["bmp", "png"]' -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 --emrun --shell-file $(HTML) -g3 --preload-file examples/opengl-simple@/
 
 
 LUA_SRC = $(shell ls ./lua/*.c | grep -v "luac.c" | grep -v "lua.c" | tr "\n" " ")
@@ -32,10 +30,6 @@ run: all
 $(ENGINE): $(OBJS) $(LUA_A) $(HTML)
 	mkdir -p $(BUILD)
 	$(CXX) $(LUA_A) $(OBJS) -o $(ENGINE) $(LINKFLAGS)
-
-$(COPY_DEST): $(BUILD)/% : $(SRC)/copy/% $(COPY)
-	mkdir -p $(BUILD)
-	cp $< $@
 
 $(OBJS): %.o : %.cpp $(HEADERS)
 	$(CXX) -c $(CXX_COMPILEFLAGS) $< -o $@

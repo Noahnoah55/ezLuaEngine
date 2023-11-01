@@ -6,7 +6,8 @@
 #include<SDL2/SDL_ttf.h>
 #include<SDL2/SDL_mixer.h>
 
-class EZLUA_AssetStore {
+namespace ezlua {
+class asset_store {
     public:
         SDL_Texture* get_texture(std::string text);
         TTF_Font* get_font(std::string path, int ptsize);
@@ -20,3 +21,5 @@ class EZLUA_AssetStore {
         std::unordered_map<std::string, Mix_Chunk*> chunks;
         std::unordered_map<std::string, Mix_Music*> musics;
 };
+
+}

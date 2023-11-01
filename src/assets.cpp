@@ -1,11 +1,10 @@
 #include "assets.hpp"
-#include "singletons.hpp"
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_mixer.h>
 #include<iostream>
 
-SDL_Texture* EZLUA_AssetStore::get_texture(std::string path)
+SDL_Texture* ezlua::asset_store::get_texture(std::string path)
 {
     if (this->textures.find(path) != this->textures.end()) {
         return this->textures.at(path);
@@ -16,13 +15,13 @@ SDL_Texture* EZLUA_AssetStore::get_texture(std::string path)
             std::cout << IMG_GetError() << "\n";
             return NULL;
         }
-        SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+        SDL_Texture* tex = SDL_CreateTextureFromSurface(NULL, surf);
         this->textures[path] = tex;
         return tex;
     }
 }
 
-TTF_Font *EZLUA_AssetStore::get_font(std::string path, int ptsize)
+TTF_Font *ezlua::asset_store::get_font(std::string path, int ptsize)
 {
     std::pair query(path, ptsize);
     if (this->fonts.find(query) != this->fonts.end()) {
@@ -41,7 +40,7 @@ TTF_Font *EZLUA_AssetStore::get_font(std::string path, int ptsize)
     }
 };
 
-Mix_Chunk *EZLUA_AssetStore::get_chunk(std::string path) {
+Mix_Chunk *ezlua::asset_store::get_chunk(std::string path) {
     if (this->chunks.find(path) != this->chunks.end()) {
         return this->chunks.at(path);
     }
@@ -56,7 +55,7 @@ Mix_Chunk *EZLUA_AssetStore::get_chunk(std::string path) {
     }
 }
 
-Mix_Music *EZLUA_AssetStore::get_music(std::string path) {
+Mix_Music *ezlua::asset_store::get_music(std::string path) {
     if (this->musics.find(path) != this->musics.end()) {
         return this->musics.at(path);
     }
