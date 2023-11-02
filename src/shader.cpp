@@ -4,7 +4,7 @@
 
 const char *defaultVertexShaderSource = "#version 300 es\n"
     "layout (location = 0) in vec3 aPos;\n"
-    "uniform highp mat4 transform\n"
+    "uniform highp mat4 transform;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = transform * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
