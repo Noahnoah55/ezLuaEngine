@@ -62,10 +62,10 @@ int ezlua::gfx::init_gfx() {
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
     const float rect_verts[] = {
-        1.0f, 1.0f, 0.0f, // TOP RIGHT
-        1.0f, 0.0f, 0.0f, // BOTTOM RIGHT
-        0.0f, 0.0f, 0.0f, // BOTTOM LEFT
-        0.0f, 1.0f, 0.0f, // TOP LEFT
+         0.5f,  0.5f, 0.0f, // TOP RIGHT
+         0.5f, -0.5f, 0.0f, // BOTTOM RIGHT
+        -0.5f, -0.5f, 0.0f, // BOTTOM LEFT
+        -0.5f,  0.5f, 0.0f, // TOP LEFT
     };
     const unsigned int rect_indices[] = {
         0, 1, 3, // TRI ONE
@@ -110,7 +110,8 @@ void ezlua::gfx::draw_rect(transform pos, color col) {
     shader->use();
     glBindVertexArray(CONTEXTS[RECTANGLE_FLAT].VAO);
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(pos.x, pos.y, 0));
+    model = glm::translate(model, glm::vec3(pos.x+pos.width/2, pos.y+pos.height/2, 0));
+    model = glm::rotate(model, pos.rotation, glm::vec3(0.0f,0.0f,1.0f));
     model = glm::scale(model, glm::vec3(pos.width, pos.height, 1));
     auto proj = glm::ortho(0.0f, 600.0f, 300.0f, 0.0f);
 
