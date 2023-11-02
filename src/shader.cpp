@@ -4,18 +4,20 @@
 
 const char *defaultVertexShaderSource = "#version 300 es\n"
     "layout (location = 0) in vec3 aPos;\n"
-    "uniform highp mat4 transform;\n"
+    "uniform highp mat4 proj;\n"
+    "uniform highp mat4 model;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = transform * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "   gl_Position = proj * model * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
 
 const char *defaultFragmentShaderSource = "#version 300 es\n"
     "precision highp float;\n"
+    "uniform vec4 color;\n"
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
-    "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "FragColor = color;\n"
     "}\0";
 
 ezlua::shader_program::shader_program() {

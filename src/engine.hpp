@@ -24,7 +24,7 @@ namespace ezlua {
 
             void draw_text(string fontpath, string text, int x, int y, TEXT_ALIGN alignment, color c);
             void draw_line(int x, int y, int width, color c);
-            void draw_rect(int x, int y, int width, int height, sol::table color);
+            void draw_rect(float x, float y, float width, float height, sol::table color);
             void draw_sprite(int x, int y, int width, int height, string path);
 
         private:

@@ -96,10 +96,10 @@ void ezlua::engine::generate_shapes(){
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
     const float rect_verts[] = {
-         0.5f,  0.5f, 0.0f, // TOP RIGHT
-         0.5f, -0.5f, 0.0f, // BOTTOM RIGHT
-        -0.5f, -0.5f, 0.0f, // BOTTOM LEFT
-        -0.5f,  0.5f, 0.0f, // TOP LEFT
+        1.0f, 1.0f, 0.0f, // TOP RIGHT
+        1.0f, 0.0f, 0.0f, // BOTTOM RIGHT
+        0.0f, 0.0f, 0.0f, // BOTTOM LEFT
+        0.0f, 1.0f, 0.0f, // TOP LEFT
     };
     const unsigned int rect_indices[] = {
         0, 1, 3, // TRI ONE
@@ -138,13 +138,22 @@ void ezlua::engine::tick() {
     lua_ontick();
 }
 
-void ezlua::engine::draw_rect(int x, int y, int width, int height, sol::table color)
-{
+void ezlua::engine::draw_rect(float x, float y, float width, float height, sol::table color) {
     shader->use();
     glBindVertexArray(vaos[RECTANGLE]);
-    auto ortho = glm::ortho(0.0f, 600.0f, 300.0f, 0.0f);
-    unsigned int transformLoc = glGetUniformLocation(shader->id, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(ortho));
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(x, y, 0));
+    model = glm::scale(model, glm::vec3(width, height, 1));
+    auto proj = glm::ortho(0.0f, 600.0f, 300.0f, 0.0f);
+
+    glm::vec4 outColor((float)color[1]/255.0f, (float)color[2]/255.0f, (float)color[3]/255.0f, 1);
+
+    unsigned int modelLoc = glGetUniformLocation(shader->id, "model");
+    unsigned int projLoc = glGetUniformLocation(shader->id, "proj");
+    unsigned int colorLoc = glGetUniformLocation(shader->id, "color");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+    glUniform4fv(colorLoc, 1, glm::value_ptr(outColor));
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

@@ -18,6 +18,7 @@ LUA_A = liblua.a
 ENGINE = $(BUILD)/game.html
 
 GAME_FILES = game-files
+.PHONY: $(ENGINE)
 
 all: $(ENGINE) $(COPY_DEST)
 
