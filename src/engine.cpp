@@ -1,19 +1,15 @@
 #include"engine.hpp"
 #include"shader.hpp"
+#include"gfx.hpp"
 
 #include<iostream>
 #include<SDL2/SDL.h>
-#include<SDL2/SDL_image.h>
 #include<SDL2/SDL_mixer.h>
 #include<SDL2/SDL_ttf.h>
 #include<SDL2/SDL_opengl.h>
 
 #include<GLES3/gl3.h>
 #include<GL/glew.h>
-
-#include<glm/glm.hpp>
-#include<glm/gtc/matrix_transform.hpp>
-#include<glm/gtc/type_ptr.hpp>
 
 float verts[] = {
     0.5f, 0.5f, 0.0f,
@@ -43,78 +39,21 @@ int ezlua::engine::initialize()
         std::cout << "SDL_ttf failed to initialize, error: " << TTF_GetError() << "\n";
         return -1;
     }
-    
-    int img_flags = IMG_INIT_PNG;
 
-    if (IMG_Init(img_flags) != img_flags) {
-        std::cout << "SDL_Image failed to initialize, error: " << IMG_GetError() << "\n";
-        return -1;
-    }
+    ezlua::gfx::init_gfx();
 
-    window = SDL_CreateWindow("", 0, 0, 600, 300, SDL_WINDOW_OPENGL);
-
-    if (window == NULL) {
-        std::cout << "SDL failed to create a window, error: " << SDL_GetError() << "\n";
-        return -1;
-    }
-
-    gl_context = SDL_GL_CreateContext(window);
-
-    if (gl_context == NULL) {
-        std::cout << "SDL failed to initialize an OpenGL context, error: " << SDL_GetError() << "\n";
-        return -1;
-    }
-
-    glewExperimental = GL_TRUE;
-    GLenum glewError = glewInit();
-    if (glewError != GLEW_OK) {
-        std::cout << "GLEW failed to initialize, error: " << glewGetErrorString(glewError) << "\n";
-    }
-
-    std::cout << glGetString(GL_VERSION) << "\n";
-
-    std::cout << "Compiling shaders!\n";
-
-    shader = new shader_program();
-
-    generate_shapes();
-
-    std::cout << "Shaders compiled!\n";
 
     int success = 0;
 
-    success = success | _init_lua();
+    success = success | init_lua();
 
     return success;
 }
 
-void ezlua::engine::generate_shapes(){
-    GLuint VBO;
-    GLuint EBO;
-    glGenVertexArrays(static_cast<int>(_SHAPE_TOTAL), vaos);
-    glBindVertexArray(vaos[RECTANGLE]);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    const float rect_verts[] = {
-        1.0f, 1.0f, 0.0f, // TOP RIGHT
-        1.0f, 0.0f, 0.0f, // BOTTOM RIGHT
-        0.0f, 0.0f, 0.0f, // BOTTOM LEFT
-        0.0f, 1.0f, 0.0f, // TOP LEFT
-    };
-    const unsigned int rect_indices[] = {
-        0, 1, 3, // TRI ONE
-        1, 2, 3, // TRI TWO
-    };
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rect_verts), rect_verts, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rect_indices), rect_indices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*) 0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
+void ezlua::engine::init_primatives(){
 }
 
-int ezlua::engine::_init_lua() {
+int ezlua::engine::init_lua() {
     lua_state.open_libraries(sol::lib::base, sol::lib::table, sol::lib::math, sol::lib::package);
     lua_state.script(
         R"(
@@ -138,22 +77,8 @@ void ezlua::engine::tick() {
     lua_ontick();
 }
 
-void ezlua::engine::draw_rect(float x, float y, float width, float height, sol::table color) {
-    shader->use();
-    glBindVertexArray(vaos[RECTANGLE]);
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(x, y, 0));
-    model = glm::scale(model, glm::vec3(width, height, 1));
-    auto proj = glm::ortho(0.0f, 600.0f, 300.0f, 0.0f);
-
-    glm::vec4 outColor((float)color[1]/255.0f, (float)color[2]/255.0f, (float)color[3]/255.0f, 1);
-
-    unsigned int modelLoc = glGetUniformLocation(shader->id, "model");
-    unsigned int projLoc = glGetUniformLocation(shader->id, "proj");
-    unsigned int colorLoc = glGetUniformLocation(shader->id, "color");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-    glUniform4fv(colorLoc, 1, glm::value_ptr(outColor));
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+void ezlua::engine::draw_rect(float x, float y, float width, float height, float rot, sol::table color) {
+    ezlua::gfx::transform trans{x, y, width, height, rot};
+    ezlua::gfx::color col{color[1], color[2], color[3], 255};
+    ezlua::gfx::draw_rect(trans, col);
 }

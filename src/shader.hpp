@@ -3,13 +3,12 @@
 #include<string>
 using namespace std;
 
-namespace ezlua {
+namespace ezlua::gfx {
     class shader_program {
         public:
             unsigned int id;
 
-            shader_program();
-            shader_program(string vertex_path, string fragment_path);
+            shader_program(const char* vertex_path, const char* fragment_path);
             void use();
 
             void setBool(string name, bool value);

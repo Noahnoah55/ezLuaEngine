@@ -7,9 +7,9 @@ HTML = $(SRC)/shell.html
 
 CXX = em++
 CC = emcc
-C_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -g3
-CXX_COMPILEFLAGS = -sNO_DISABLE_EXCEPTION_CATCHING -std=c++17 -g -Iinclude -Ilua -Isol2/include -g3
-LINKFLAGS = --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sSDL2_IMAGE_FORMATS='["bmp", "png"]' -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 --emrun --shell-file $(HTML) -g3 --preload-file examples/opengl-simple@/
+C_COMPILEFLAGS = -fwasm-exceptions -g3
+CXX_COMPILEFLAGS = -fwasm-exceptions -std=c++17 -g -Iinclude -Ilua -Isol2/include -g3
+LINKFLAGS = -fwasm-exceptions --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 --emrun --shell-file $(HTML) -g3 --preload-file examples/opengl-simple@/ --preload-file src/shaders@/shaders/
 
 
 LUA_SRC = $(shell ls ./lua/*.c | grep -v "luac.c" | grep -v "lua.c" | tr "\n" " ")
