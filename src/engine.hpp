@@ -2,6 +2,7 @@
 
 #include"assets.hpp"
 #include"types.hpp"
+#include"shader.hpp"
 
 #include<string>
 #include<SDL2/SDL.h>
@@ -11,6 +12,11 @@
 using namespace std;
 
 namespace ezlua {
+    enum SHAPE {
+        RECTANGLE,
+        LINE,
+        _SHAPE_TOTAL
+    };
     class engine {
         public:
             int initialize();
@@ -22,11 +28,15 @@ namespace ezlua {
             void draw_sprite(int x, int y, int width, int height, string path);
 
         private:
+            void generate_shapes();
             int _init_lua();
             SDL_Window *window;
             SDL_GLContext gl_context;
             asset_store assets;
             sol::state lua_state;
             sol::protected_function lua_ontick;
+            unsigned int vaos[static_cast<int>(SHAPE::_SHAPE_TOTAL)];
+
+            ezlua::shader_program* shader;
     };
 }

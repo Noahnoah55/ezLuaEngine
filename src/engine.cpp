@@ -1,4 +1,5 @@
 #include"engine.hpp"
+#include"shader.hpp"
 
 #include<iostream>
 #include<SDL2/SDL.h>
@@ -9,25 +10,10 @@
 
 #include<GLES3/gl3.h>
 #include<GL/glew.h>
-unsigned int VAO;
-unsigned int VBO;
-unsigned int EBO;
-unsigned int shaderProgram;
 
-const char *vertexShaderSource = "#version 300 es\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-const char *fragmentShaderSource = "#version 300 es\n"
-    "precision highp float;\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\0";
+#include<glm/glm.hpp>
+#include<glm/gtc/matrix_transform.hpp>
+#include<glm/gtc/type_ptr.hpp>
 
 float verts[] = {
     0.5f, 0.5f, 0.0f,
@@ -89,39 +75,9 @@ int ezlua::engine::initialize()
 
     std::cout << "Compiling shaders!\n";
 
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader); // TODO CHECK SHADER COMPILATION SUCCESS
+    shader = new shader_program();
 
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
+    generate_shapes();
 
     std::cout << "Shaders compiled!\n";
 
@@ -130,6 +86,32 @@ int ezlua::engine::initialize()
     success = success | _init_lua();
 
     return success;
+}
+
+void ezlua::engine::generate_shapes(){
+    GLuint VBO;
+    GLuint EBO;
+    glGenVertexArrays(static_cast<int>(_SHAPE_TOTAL), vaos);
+    glBindVertexArray(vaos[RECTANGLE]);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    const float rect_verts[] = {
+         0.5f,  0.5f, 0.0f, // TOP RIGHT
+         0.5f, -0.5f, 0.0f, // BOTTOM RIGHT
+        -0.5f, -0.5f, 0.0f, // BOTTOM LEFT
+        -0.5f,  0.5f, 0.0f, // TOP LEFT
+    };
+    const unsigned int rect_indices[] = {
+        0, 1, 3, // TRI ONE
+        1, 2, 3, // TRI TWO
+    };
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rect_verts), rect_verts, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rect_indices), rect_indices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
 }
 
 int ezlua::engine::_init_lua() {
@@ -158,8 +140,11 @@ void ezlua::engine::tick() {
 
 void ezlua::engine::draw_rect(int x, int y, int width, int height, sol::table color)
 {
-    glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
+    shader->use();
+    glBindVertexArray(vaos[RECTANGLE]);
+    auto ortho = glm::ortho(0.0f, 600.0f, 300.0f, 0.0f);
+    unsigned int transformLoc = glGetUniformLocation(shader->id, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(ortho));
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

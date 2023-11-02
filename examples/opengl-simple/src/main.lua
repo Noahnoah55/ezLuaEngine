@@ -1,9 +1,3 @@
 function _update()
-    drawRect(x, 100, 20, 20, {255, 255, 255})
-    x = x + 1
-    if x > 600 then
-        x = 0
-    end
+    drawRect(0, 0, 20, 20, {255, 255, 255})
 end
-
-x = 0
