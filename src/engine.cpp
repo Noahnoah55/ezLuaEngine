@@ -4,8 +4,6 @@
 
 #include<iostream>
 #include<SDL2/SDL.h>
-#include<SDL2/SDL_mixer.h>
-#include<SDL2/SDL_ttf.h>
 #include<SDL2/SDL_opengl.h>
 
 #include<GLES3/gl3.h>
@@ -27,16 +25,6 @@ int ezlua::engine::initialize()
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
         std::cout << "SDL failed to initialize, error: " << SDL_GetError() << "\n";
-        return -1;
-    }
-
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
-        std::cout << "SDL_mixer failed to initialize, error: " << Mix_GetError() << "\n";
-        return -1;
-    }
-
-    if (TTF_Init() != 0) {
-        std::cout << "SDL_ttf failed to initialize, error: " << TTF_GetError() << "\n";
         return -1;
     }
 
@@ -70,6 +58,7 @@ int ezlua::engine::init_lua() {
     lua_ontick = sol::protected_function(lua_state["_update"], lua_state["__handler"]);
 
     lua_state.set_function("drawRect", &ezlua::engine::draw_rect, this);
+    lua_state.set_function("drawSpr", &ezlua::engine::draw_spr, this);
     return 0;
 }
 
@@ -81,4 +70,9 @@ void ezlua::engine::draw_rect(float x, float y, float width, float height, float
     ezlua::gfx::transform trans{x, y, width, height, rot};
     ezlua::gfx::color col{color[1], color[2], color[3], 255};
     ezlua::gfx::draw_rect(trans, col);
+}
+
+void ezlua::engine::draw_spr(float x, float y, float width, float height, float rot, std::string path) {
+    ezlua::gfx::transform trans{x, y, width, height, rot};
+    ezlua::gfx::draw_spr(trans, path);
 }

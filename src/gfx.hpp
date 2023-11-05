@@ -3,10 +3,10 @@
 
 namespace ezlua::gfx {
     struct color {
-        int r;
-        int g;
-        int b;
-        int a;
+        float r;
+        float g;
+        float b;
+        float a;
     };
 
     struct transform {
@@ -19,5 +19,5 @@ namespace ezlua::gfx {
 
     int init_gfx();
     void draw_rect(transform position, color col);
-    void draw_spr(std::string path, transform position, color col);
+    void draw_spr(transform position, std::string path);
 }

@@ -9,7 +9,7 @@ CXX = em++
 CC = emcc
 C_COMPILEFLAGS = -fwasm-exceptions -g3
 CXX_COMPILEFLAGS = -fwasm-exceptions -std=c++17 -g -Iinclude -Ilua -Isol2/include -g3
-LINKFLAGS = -fwasm-exceptions --use-preload-plugins -sFETCH -sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_SDL_MIXER=2 -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 --emrun --shell-file $(HTML) -g3 --preload-file examples/opengl-simple@/ --preload-file src/shaders@/shaders/
+LINKFLAGS = -fwasm-exceptions --use-preload-plugins -sFETCH -sUSE_SDL=2 -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 --emrun --shell-file $(HTML) -g3 --preload-file examples/opengl-simple@/ --preload-file src/shaders@/shaders/ --preload-file default-assets@/
 
 
 LUA_SRC = $(shell ls ./lua/*.c | grep -v "luac.c" | grep -v "lua.c" | tr "\n" " ")
@@ -20,7 +20,7 @@ ENGINE = $(BUILD)/game.html
 GAME_FILES = game-files
 .PHONY: $(ENGINE)
 
-all: $(ENGINE) $(COPY_DEST)
+all: $(ENGINE)
 
 run: all
 	cp -r examples/hello-world/* build/
@@ -31,6 +31,7 @@ run: all
 $(ENGINE): $(OBJS) $(LUA_A) $(HTML)
 	mkdir -p $(BUILD)
 	$(CXX) $(LUA_A) $(OBJS) -o $(ENGINE) $(LINKFLAGS)
+	cp default-assets/* $(BUILD)/
 
 $(OBJS): %.o : %.cpp $(HEADERS)
 	$(CXX) -c $(CXX_COMPILEFLAGS) $< -o $@

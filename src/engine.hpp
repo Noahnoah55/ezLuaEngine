@@ -1,6 +1,5 @@
 #pragma once
 
-#include"types.hpp"
 #include"shader.hpp"
 
 #include<string>
@@ -24,7 +23,7 @@ namespace ezlua {
             SDL_GLContext gl_context;
             sol::state lua_state;
             sol::protected_function lua_ontick;
-
             void draw_rect(float x, float y, float width, float height, float rot, sol::table color);
+            void draw_spr(float x, float y, float width, float height, float rot, std::string path);
     };
 }
