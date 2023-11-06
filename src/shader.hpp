@@ -3,7 +3,7 @@
 #include<string>
 using namespace std;
 
-namespace ezlua::gfx {
+namespace ezlua {
     class shader_program {
         public:
             unsigned int id;

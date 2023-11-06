@@ -5,10 +5,6 @@
 
 #include<iostream>
 #include<SDL2/SDL.h>
-#include<SDL2/SDL_opengl.h>
-
-#include<GLES3/gl3.h>
-#include<GL/glew.h>
 
 float verts[] = {
     0.5f, 0.5f, 0.0f,
@@ -24,18 +20,12 @@ unsigned int indices[] = {
 
 int ezlua::engine::initialize()
 {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
-        std::cout << "SDL failed to initialize, error: " << SDL_GetError() << "\n";
-        return -1;
-    }
-
-    ezlua::gfx::init_gfx();
-
     if (init_lua()){
         return -1;
     }
 
     this->modules.push_back(new input());
+    this->modules.push_back(new gfx());
 
     for (module *m : this->modules) {
         if (m->initialize(&this->lua_state) != 0) {
@@ -45,9 +35,6 @@ int ezlua::engine::initialize()
     }
 
     return 0;
-}
-
-void ezlua::engine::init_primatives(){
 }
 
 int ezlua::engine::init_lua() {
@@ -66,8 +53,6 @@ int ezlua::engine::init_lua() {
     }
     lua_ontick = sol::protected_function(lua_state["_update"], lua_state["__handler"]);
 
-    lua_state.set_function("drawRect", &ezlua::engine::draw_rect, this);
-    lua_state.set_function("drawSpr", &ezlua::engine::draw_spr, this);
     return 0;
 }
 
@@ -79,15 +64,4 @@ void ezlua::engine::tick() {
             std::cout << m->get_error(NULL) << "\n";
         }
     }
-}
-
-void ezlua::engine::draw_rect(float x, float y, float width, float height, float rot, sol::table color) {
-    ezlua::gfx::transform trans{x, y, width, height, rot};
-    ezlua::gfx::color col{color[1], color[2], color[3], 255};
-    ezlua::gfx::draw_rect(trans, col);
-}
-
-void ezlua::engine::draw_spr(float x, float y, float width, float height, float rot, std::string path) {
-    ezlua::gfx::transform trans{x, y, width, height, rot};
-    ezlua::gfx::draw_spr(trans, path);
 }

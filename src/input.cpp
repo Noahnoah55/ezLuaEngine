@@ -3,6 +3,10 @@
 #include"input.hpp"
 
 int ezlua::input::initialize(sol::state *lua) {
+    if (SDL_InitSubSystem(SDL_INIT_EVENTS) != 0) {
+        std::cout << "SDL failed to initialize events, error: " << SDL_GetError() << "\n";
+        return -1;
+    }
     lua->set_function("getKeyHeld", &ezlua::input::get_key_held, this);
     lua->set_function("getKeyJustPressed", &ezlua::input::get_key_just_pressed, this);
     lua->set_function("getScanHeld", &ezlua::input::get_scan_held, this);

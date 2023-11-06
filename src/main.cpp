@@ -12,6 +12,5 @@ int main() {
 
     emscripten_set_main_loop(main_loop, 0, 1);
 
-    SDL_Quit();
     return 0;
 }

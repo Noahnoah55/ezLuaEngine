@@ -5,7 +5,7 @@
 #include<string>
 #include<iostream>
 
-ezlua::gfx::shader_program::shader_program(const char* vertex_path, const char* fragment_path) {
+ezlua::shader_program::shader_program(const char* vertex_path, const char* fragment_path) {
     std::string vertex_code_str;
     std::string fragment_code_str;
 
@@ -65,7 +65,7 @@ ezlua::gfx::shader_program::shader_program(const char* vertex_path, const char* 
     glDeleteShader(fragmentShader);
 }
 
-void ezlua::gfx::shader_program::use()
+void ezlua::shader_program::use()
 {
     glUseProgram(id);
 }

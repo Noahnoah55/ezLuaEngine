@@ -26,7 +26,7 @@ enum PRIMATIVE {
 };
 
 struct render_ctx {
-    ezlua::gfx::shader_program *program = NULL;
+    ezlua::shader_program *program = NULL;
     GLuint VAO = GL_FALSE;
     int tryUse() {
         if (program == NULL || VAO == GL_FALSE) {
@@ -47,7 +47,7 @@ SDL_GLContext gl_context;
 
 // SECRET HELPER FUNCTIONS
 
-glm::mat4 ortho_transform(ezlua::gfx::transform pos) {
+glm::mat4 ortho_transform(ezlua::transform pos) {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(pos.x+pos.width/2, pos.y+pos.height/2, 0));
     model = glm::rotate(model, pos.rotation, glm::vec3(0.0f,0.0f,1.0f));
@@ -84,7 +84,12 @@ GLuint get_texture(std::string path)
 
 // EXPOSED FUNCTIONS
 
-int ezlua::gfx::init_gfx() {
+int ezlua::gfx::initialize(sol::state *lua) {
+    // INIT REQUIRED SDL SUBSYSTEMS
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
+        std::cout << "SDL failed to initialize video, error: " << SDL_GetError() << "\n";
+        return -1;
+    }
     // MAKE WINDOW AND CONTEXT
     WINDOW = SDL_CreateWindow("", 0, 0, 600, 300, SDL_WINDOW_OPENGL);
     if (WINDOW == NULL) {
@@ -155,12 +160,22 @@ int ezlua::gfx::init_gfx() {
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
     CONTEXTS[RECTANGLE_TEX].program = new shader_program("/shaders/textured.vert", "/shaders/textured.frag");
+
+
+    // REGISTER LUA API
+    lua->set_function("drawRect", &ezlua::gfx::draw_rect, this);
+    lua->set_function("drawSpr", &ezlua::gfx::draw_spr, this);
     return 0;
 }
 
 
+void ezlua::gfx::draw_rect(float x, float y, float width, float height, float rot, sol::table color) {
+    ezlua::transform trans{x, y, width, height, rot};
+    ezlua::color col{color[1], color[2], color[3], 255};
+    _draw_rect(trans, col);
+}
 
-void ezlua::gfx::draw_rect(transform pos, color col) {
+void ezlua::gfx::_draw_rect(transform pos, color col) {
     CONTEXTS[RECTANGLE_FLAT].tryUse();
 
     glm::mat4 transform = ortho_transform(pos);
@@ -176,7 +191,12 @@ void ezlua::gfx::draw_rect(transform pos, color col) {
     glBindVertexArray(0);
 }
 
-void ezlua::gfx::draw_spr(transform pos, std::string path) {
+void ezlua::gfx::draw_spr(float x, float y, float width, float height, float rot, std::string path) {
+    ezlua::transform trans{x, y, width, height, rot};
+    _draw_spr(trans, path);
+}
+
+void ezlua::gfx::_draw_spr(transform pos, std::string path) {
     CONTEXTS[RECTANGLE_TEX].tryUse();
 
     glm::mat4 trans = ortho_transform(pos);
@@ -191,4 +211,13 @@ void ezlua::gfx::draw_spr(transform pos, std::string path) {
     glUniform1i(textureLoc, 0);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+int ezlua::gfx::on_tick(sol::state*) {
+    return 0;
+}
+
+const char* ezlua::gfx::get_error(int *const len) {
+    *len = 0;
+    return NULL;
 }
