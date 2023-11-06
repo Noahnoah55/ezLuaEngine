@@ -23,4 +23,4 @@ Finally, build the engine and host the demo game with
 
 The engine starts by loading ```src/main.lua```, and will call ```_update()``` every frame
 
-API reference is unfinished, but all lua functions are defined in ```src/api.c```
+API is unfinished, see examples for help
