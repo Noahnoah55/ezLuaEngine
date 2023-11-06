@@ -4,7 +4,22 @@ function _update()
     if x > 600 then
         x = 0
     end
-    drawSpr(295, 100, 10, 100, math.rad(x)*3, "ezle.png")
+    drawSpr(px, py, 10, 100, math.rad(x)*3, "ezle.png")
+    if getKeyHeld("w") then
+        py = py - spd
+    end
+    if getKeyHeld("a") then
+        px = px - spd
+    end
+    if getKeyHeld("d") then
+        px = px + spd
+    end
+    if getKeyHeld("s") then
+        py = py + spd
+    end
 end
 
+px = 295
+py = 100
+spd = 3
 x = 0

@@ -1,11 +1,12 @@
 #pragma once
 
-#include"shader.hpp"
+#include"module.hpp"
 
 #include<string>
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_opengl.h>
 #include<sol/sol.hpp>
+#include<functional>
 
 using namespace std;
 
@@ -25,5 +26,7 @@ namespace ezlua {
             sol::protected_function lua_ontick;
             void draw_rect(float x, float y, float width, float height, float rot, sol::table color);
             void draw_spr(float x, float y, float width, float height, float rot, std::string path);
+            
+            std::vector<module*> modules;
     };
 }

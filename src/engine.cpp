@@ -1,6 +1,7 @@
 #include"engine.hpp"
 #include"shader.hpp"
 #include"gfx.hpp"
+#include"input.hpp"
 
 #include<iostream>
 #include<SDL2/SDL.h>
@@ -30,12 +31,20 @@ int ezlua::engine::initialize()
 
     ezlua::gfx::init_gfx();
 
+    if (init_lua()){
+        return -1;
+    }
 
-    int success = 0;
+    this->modules.push_back(new input());
 
-    success = success | init_lua();
+    for (module *m : this->modules) {
+        if (m->initialize(&this->lua_state) != 0) {
+            std::cout << m->get_error(NULL) << "\n";
+            return -1;
+        }
+    }
 
-    return success;
+    return 0;
 }
 
 void ezlua::engine::init_primatives(){
@@ -64,6 +73,12 @@ int ezlua::engine::init_lua() {
 
 void ezlua::engine::tick() {
     lua_ontick();
+
+    for (module *m : this->modules) {
+        if (m->on_tick(&this->lua_state)) {
+            std::cout << m->get_error(NULL) << "\n";
+        }
+    }
 }
 
 void ezlua::engine::draw_rect(float x, float y, float width, float height, float rot, sol::table color) {
