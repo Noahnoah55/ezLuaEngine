@@ -10,16 +10,21 @@ WIP web game engine using emscripten and LUA
 
 ## Building
 
-Currently only building for Linux, Windows builds coming next time I work on this at my PC
+This project uses submodules, clone with ```$ git clone --recursive-submodules {URL}```
+to automatically include submodules. You can also populate these submodules after cloning
+with ```$ git submodule update -init```
 
-After cloning the repository, populate the submodule directories with
-```git submodule update --init```
+Before building, activate emsdk with ```$ source configure```
 
-Then load the included emsdk to your path with
-```source configure```
+Finally, to build the project and run the test game:
 
-Finally, build the engine and host the demo game with
-```make run```
+```bash
+mkdir build
+cd build
+emcmake cmake ..
+make
+emrun engine.html
+```
 
 The engine starts by loading ```src/main.lua```, and will call ```_update()``` every frame
 
