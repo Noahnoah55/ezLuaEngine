@@ -79,6 +79,7 @@ if(EMSCRIPTEN)
         ${EMSCRIPTEN_SHELL_FLAG}
     )
     set_target_properties(engine PROPERTIES SUFFIX .html)
+    configure_file(src/favicon.ico favicon.ico COPYONLY)
 else()
     message(FATAL_ERROR "Emscripten is required, run with emcmake") # TODO: Add native build support
 endif()
