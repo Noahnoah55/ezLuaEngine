@@ -21,7 +21,7 @@ namespace ezlua {
     class gfx: virtual public module {
         int initialize(sol::state *lua);
         int on_tick(sol::state *lua);
-        const char* get_error(int *len);
+        const char* get_name(int *len);
 
         void _draw_rect(transform position, color col);
         void draw_rect(float x, float y, float width, float height, float rot, sol::table color);

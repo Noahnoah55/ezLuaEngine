@@ -11,8 +11,12 @@ namespace ezlua {
             shader_program(const char* vertex_path, const char* fragment_path);
             void use();
 
+            bool valid();
+
             void setBool(string name, bool value);
             void setInt(string name, int value);
             void setFloat(string name, float value);
+        private:
+            bool _valid_flag;
     };
 }

@@ -11,7 +11,7 @@ namespace ezlua {
         public:
             int initialize(sol::state *lua);
             int on_tick(sol::state *lua);
-            const char* get_error(int *len);
+            const char* get_name(int *len);
 
             bool get_key_held(std::string key_name);
             bool get_key_just_pressed(std::string key_name);
@@ -20,7 +20,6 @@ namespace ezlua {
             bool get_scan_just_pressed(std::string scan_name);
 
         private:
-            std::string error = "";
             Uint8 keystate_current[SDL_NUM_SCANCODES];
             Uint8 keystate_last[SDL_NUM_SCANCODES];
     };

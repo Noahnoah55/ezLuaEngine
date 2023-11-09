@@ -6,12 +6,12 @@ set(EMSCRIPTEN_LINK_PRELOAD_FLAGS
 "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/examples/opengl-simple@/"
 "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/src/shaders@/shaders/"
 "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/default-assets@/")
-set(EMSCRIPTEN_LINK_LIBRARY_FLAGS
--sUSE_SDL=2
--sMIN_WEBGL_VERSION=2 
--sMAX_WEBGL_VERSION=2)
+set(EMSCRIPTEN_USE_FLAGS -sUSE_SDL=2)
 set(EMSCRIPTEN_EXCEPTION_FLAG -fwasm-exceptions)
 set(EMSCRIPTEN_SHELL_FLAG --shell-file ${CMAKE_SOURCE_DIR}/src/shell.html)
+set(EMSCRIPTEN_LINK_OPENGL_FLAGS
+-sMIN_WEBGL_VERSION=2
+-sMAX_WEBGL_VERSION=2)
 
 add_library(lua
     lua/lapi.c
@@ -52,7 +52,6 @@ add_library(lua
 add_executable(engine 
     src/main.cpp
     src/engine.cpp
-    src/fetch.cpp
     src/gfx.cpp
     src/input.cpp
     src/shader.cpp
@@ -63,19 +62,23 @@ target_include_directories(engine PUBLIC
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/sol2/include
     ${PROJECT_SOURCE_DIR}/lua
+    ${PROJECT_SOURCE_DIR}/spdlog/include
 )
 
+add_subdirectory(spdlog)
 target_link_libraries(engine PUBLIC lua)
+target_link_libraries(engine PRIVATE spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
 
 if(EMSCRIPTEN)
     message("Using emscripten!")
     target_compile_options(lua PUBLIC ${EMSCRIPTEN_EXCEPTION_FLAG})
-    target_compile_options(engine PUBLIC ${EMSCRIPTEN_EXCEPTION_FLAG})
+    target_compile_options(engine PUBLIC ${EMSCRIPTEN_EXCEPTION_FLAG} ${EMSCRIPTEN_USE_FLAGS})
     target_link_options(engine PUBLIC
         --use-preload-plugins --emrun
+        ${EMSCRIPTEN_LINK_OPENGL_FLAGS}
         ${EMSCRIPTEN_EXCEPTION_FLAG}
         ${EMSCRIPTEN_LINK_PRELOAD_FLAGS}
-        ${EMSCRIPTEN_LINK_LIBRARY_FLAGS}
+        ${EMSCRIPTEN_USE_FLAGS}
         ${EMSCRIPTEN_SHELL_FLAG}
     )
     set_target_properties(engine PROPERTIES SUFFIX .html)

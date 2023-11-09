@@ -12,6 +12,8 @@
 
 #include<stb_image.h>
 
+#include<spdlog/spdlog.h>
+
 #include<unordered_map>
 #include<string>
 #include<iostream>
@@ -30,6 +32,15 @@ struct render_ctx {
     GLuint VAO = GL_FALSE;
     int tryUse() {
         if (program == NULL || VAO == GL_FALSE) {
+            if (program == NULL && VAO != GL_FALSE) {
+                spdlog::error("Couldn't use a render context, shader program pointer == null");
+            }
+            else if (VAO == GL_FALSE && program != NULL) {
+                spdlog::error("Couldn't use a render context, VAO id == GL_FALSE (0)");
+            }
+            else {
+                spdlog::error("Couldn't use a render context, both VAO and shader program are unset!");
+            }
             return -1;
         }
         glBindVertexArray(VAO);
@@ -44,6 +55,7 @@ render_ctx CONTEXTS[static_cast<int>(_PRIMATIVE_END)];
 std::unordered_map<std::string, GLuint> TEXTURES;
 SDL_Window *WINDOW;
 SDL_GLContext gl_context;
+static const char* name = "Graphics";
 
 // SECRET HELPER FUNCTIONS
 
@@ -66,7 +78,7 @@ GLuint get_texture(std::string path)
         int w, h;
         unsigned char *data = stbi_load(path.c_str(), &w, &h, NULL, 4);
         if (data == NULL) {
-            std::cout << "Failed to load texture, error: " << stbi_failure_reason() << "\n";
+            spdlog::error("Failed to load texture, reason: {}", stbi_failure_reason());
             return GL_FALSE; // 0 should be a special ID which is never assigned by opengl
         }
         GLuint id;
@@ -83,30 +95,38 @@ GLuint get_texture(std::string path)
 
 // EXPOSED FUNCTIONS
 
+const char* ezlua::gfx::get_name(int *const len) {
+    if (len != NULL) {
+        *len = strlen(name);
+    }
+    return name;
+}
+
 int ezlua::gfx::initialize(sol::state *lua) {
     // INIT REQUIRED SDL SUBSYSTEMS
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
-        std::cout << "SDL failed to initialize video, error: " << SDL_GetError() << "\n";
+        spdlog::error("SDL failed to initialize video, reason: {}", SDL_GetError());
         return -1;
     }
     // MAKE WINDOW AND CONTEXT
     WINDOW = SDL_CreateWindow("", 0, 0, 600, 300, SDL_WINDOW_OPENGL);
     if (WINDOW == NULL) {
-        std::cout << "SDL failed to create a window, error: " << SDL_GetError() << "\n";
+        spdlog::error("SDL failed to create a window, reason: {}", SDL_GetError());
         return -1;
     }
     gl_context = SDL_GL_CreateContext(WINDOW);
     if (gl_context == NULL) {
-        std::cout << "SDL failed to initialize an OpenGL context, error: " << SDL_GetError() << "\n";
+        spdlog::error("SDL failed to create an OpenGL context, reason: {}", SDL_GetError());
         return -1;
     }
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
     if (glewError != GLEW_OK) {
-        std::cout << "GLEW failed to initialize, error: " << glewGetErrorString(glewError) << "\n";
+        spdlog::error("GLEW failed to initialize, reason: {}", (char*)glewGetErrorString(glewError));
+        return -1;
     }
 
-    std::cout << glGetString(GL_VERSION) << "\n";
+    spdlog::info("Opengl Version: {}", (char*)glGetString(GL_VERSION));
 
     // INITIALIZE PRIMATIVES
     GLuint VBO;
@@ -133,6 +153,10 @@ int ezlua::gfx::initialize(sol::state *lua) {
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
     CONTEXTS[RECTANGLE_FLAT].program = new shader_program("/shaders/flat.vert", "/shaders/flat.frag");
+    if (CONTEXTS[RECTANGLE_FLAT].program->valid() == false){
+        spdlog::error("Failed to initialize shader for RECTANGLE_FLAT");
+        return -1;
+    }
 
     glGenVertexArrays(1, &CONTEXTS[RECTANGLE_TEX].VAO);
     glBindVertexArray(CONTEXTS[RECTANGLE_TEX].VAO);
@@ -159,6 +183,10 @@ int ezlua::gfx::initialize(sol::state *lua) {
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
     CONTEXTS[RECTANGLE_TEX].program = new shader_program("/shaders/textured.vert", "/shaders/textured.frag");
+    if (CONTEXTS[RECTANGLE_TEX].program->valid() == false){
+        spdlog::error("Failed to initialize shader for RECTANGLE_TEX");
+        return -1;
+    }
 
 
     // REGISTER LUA API
@@ -214,9 +242,4 @@ void ezlua::gfx::_draw_spr(transform pos, std::string path) {
 
 int ezlua::gfx::on_tick(sol::state*) {
     return 0;
-}
-
-const char* ezlua::gfx::get_error(int *const len) {
-    *len = 0;
-    return NULL;
 }

@@ -4,8 +4,10 @@
 #include<fstream>
 #include<string>
 #include<iostream>
+#include<spdlog/spdlog.h>
 
 ezlua::shader_program::shader_program(const char* vertex_path, const char* fragment_path) {
+    _valid_flag = true;
     std::string vertex_code_str;
     std::string fragment_code_str;
 
@@ -17,7 +19,7 @@ ezlua::shader_program::shader_program(const char* vertex_path, const char* fragm
         vertex_code_str.append("\n");
     }
     if (!vertex_stream.eof()) {
-        std::cout << "May have failed to read vertex stream\n";
+        spdlog::critical("May have failed to read vertex stream");
     }
     buff[0] = '\0';
 
@@ -28,7 +30,7 @@ ezlua::shader_program::shader_program(const char* vertex_path, const char* fragm
         fragment_code_str.append("\n");
     }
     if (!fragment_stream.eof()) {
-        std::cout << "May have failed to read fragment stream\n";
+        spdlog::critical("May have failed to read fragment stream");
     }
     buff[0] = '\0';
 
@@ -43,7 +45,9 @@ ezlua::shader_program::shader_program(const char* vertex_path, const char* fragm
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compile_status);
     if (!compile_status) {
         glGetShaderInfoLog(vertexShader, 512, NULL, buff);
-        printf("\nFAILED to compile vertex shader!\n---\n%s\n---\n%s---\n", vertex_code, buff);
+        spdlog::error("Failed to compile vertex shader from {}, error: {}\n{}",
+            vertex_path, buff, vertex_code);
+        _valid_flag = false;
     }
 
     unsigned int fragmentShader;
@@ -53,19 +57,36 @@ ezlua::shader_program::shader_program(const char* vertex_path, const char* fragm
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &compile_status);
     if (!compile_status) {
         glGetShaderInfoLog(fragmentShader, 512, NULL, buff);
-        printf("\nFAILED to compile fragment shader!\n---\n%s\n---\n%s---\n", fragment_code, buff);
+        spdlog::error("Failed to compile fragment shader from {}, error: {}\n{}",
+            fragment_path, buff, fragment_code);
+        _valid_flag = false;
     }
 
     id = glCreateProgram();
     glAttachShader(id, vertexShader);
     glAttachShader(id, fragmentShader);
     glLinkProgram(id);
+    glGetProgramiv(id, GL_LINK_STATUS, &compile_status);
+    if (!compile_status) {
+        glGetProgramInfoLog(id, 512, NULL, buff);
+        spdlog::error("Failed to link shader program from sources {} and {}, error: {}",
+            vertex_path, fragment_path, buff);
+        _valid_flag = false;
+    }
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 }
 
-void ezlua::shader_program::use()
-{
-    glUseProgram(id);
+void ezlua::shader_program::use() {
+    if (valid()) {
+        glUseProgram(id);
+    }
+    else {
+        spdlog::error("Tried to use an invalid shader program");
+    }
+}
+
+bool ezlua::shader_program::valid() {
+    return _valid_flag;
 }

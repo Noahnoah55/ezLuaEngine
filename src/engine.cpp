@@ -3,6 +3,8 @@
 #include"gfx.hpp"
 #include"input.hpp"
 
+#include<spdlog/spdlog.h>
+
 #include<iostream>
 #include<SDL2/SDL.h>
 
@@ -21,34 +23,38 @@ unsigned int indices[] = {
 int ezlua::engine::initialize()
 {
     if (init_lua()){
+        spdlog::error("Failed to initialize LUA");
         return -1;
     }
+    spdlog::info("Initialized Lua");
 
     this->modules.push_back(new input());
     this->modules.push_back(new gfx());
 
     for (module *m : this->modules) {
-        if (m->initialize(&this->lua_state) != 0) {
-            std::cout << m->get_error(NULL) << "\n";
+        int ret = m->initialize(&this->lua_state);
+        if (ret != 0) {
+            spdlog::error("Failed to initialize module {}, error code ({})", m->get_name(NULL), ret);
             return -1;
         }
+        spdlog::info("Initialized module {}", m->get_name(NULL));
     }
 
     return 0;
 }
 
+std::string error_handler(std::string msg) {
+    spdlog::error("LUA Error: {}", msg);
+    return msg;
+}
+
 int ezlua::engine::init_lua() {
     lua_state.open_libraries(sol::lib::base, sol::lib::table, sol::lib::math, sol::lib::package);
-    lua_state.script(
-        R"(
-            function __handler (message)
-                print("[LUA-ERROR]" .. message)
-            end
-        )");
+    lua_state["__handler"] = error_handler;
     auto pfr = lua_state.safe_script_file("/src/main.lua", sol::script_pass_on_error);
     if (!pfr.valid()) {
         sol::error err = pfr;
-        std::cout << err.what() << "\n";
+        spdlog::error("Failed to load main.lua, reason: ", err.what());
         return -1;
     }
     lua_ontick = sol::protected_function(lua_state["_update"], lua_state["__handler"]);
@@ -60,8 +66,9 @@ void ezlua::engine::tick() {
     lua_ontick();
 
     for (module *m : this->modules) {
-        if (m->on_tick(&this->lua_state)) {
-            std::cout << m->get_error(NULL) << "\n";
+        int ret = m->on_tick(&this->lua_state);
+        if (ret) {
+            spdlog::error("Faile to tick module {}, error code ({})", m->get_name(NULL), ret);
         }
     }
 }

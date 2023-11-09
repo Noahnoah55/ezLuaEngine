@@ -1,10 +1,19 @@
 #include<sol/sol.hpp>
-#include<sstream>
+#include<spdlog/spdlog.h>
 #include"input.hpp"
+
+static const char* name = "Input";
+
+const char* ezlua::input::get_name(int *const len) {
+    if (len != NULL) {
+        *len = strlen(name);
+    }
+    return name;
+}
 
 int ezlua::input::initialize(sol::state *lua) {
     if (SDL_InitSubSystem(SDL_INIT_EVENTS) != 0) {
-        std::cout << "SDL failed to initialize events, error: " << SDL_GetError() << "\n";
+        spdlog::error("SDL failed to initialize events, reason: {}", SDL_GetError());
         return -1;
     }
     lua->set_function("getKeyHeld", &ezlua::input::get_key_held, this);
@@ -21,17 +30,6 @@ int ezlua::input::on_tick(sol::state *lua) {
     memcpy(keystate_last, keystate_current, SDL_NUM_SCANCODES);
     memcpy(keystate_current, SDL_GetKeyboardState(NULL), SDL_NUM_SCANCODES);
     return 0;
-}
-
-const char *ezlua::input::get_error(int * len) {
-    if (error != "") {
-        if (len != NULL) {
-            *len = error.length()+1;
-        }
-        return error.c_str();
-    }
-    *len = 0;
-    return NULL;
 }
 
 bool ezlua::input::get_key_held(std::string key_name) {
