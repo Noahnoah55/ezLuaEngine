@@ -1,21 +1,31 @@
 #include"engine.hpp"
+#include"fetch.hpp"
 #include<spdlog/spdlog.h>
 #include<iostream>
 #include<emscripten.h>
 
 ezlua::engine engine;
+bool initialized = false;
 
 void main_loop() {
-    engine.tick();
+    if (initialized) {
+        engine.tick();
+    }
 }
 
-int main() {
+void init_engine() {
     spdlog::info("Engine initializing");
     if (engine.initialize() != 0) {
         spdlog::error("Engine failed to start");
-        return -1;
+        return;
     }
-    spdlog::info("Engine intitialized successfully, starting main loop");
+    spdlog::info("Engine intitialized successfully, switching to main loop");
+    initialized = true;
+}
+
+int main() {
+    spdlog::info("Fetching Manifest");
+    fetch_by_manifest("manifest.txt", init_engine);
 
     emscripten_set_main_loop(main_loop, 0, 1);
 
