@@ -125,6 +125,8 @@ int ezlua::gfx::initialize(sol::state *lua) {
         spdlog::error("GLEW failed to initialize, reason: {}", (char*)glewGetErrorString(glewError));
         return -1;
     }
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     spdlog::info("Opengl Version: {}", (char*)glGetString(GL_VERSION));
 
