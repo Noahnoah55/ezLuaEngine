@@ -1,5 +1,5 @@
 #pragma once
-#include"module.hpp"
+#include<module.hpp>
 #include<string>
 
 namespace ezlua {

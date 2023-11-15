@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(EMSCRIPTEN_LINK_PRELOAD_FLAGS
 "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/src/shaders@/shaders/"
 "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/default-assets@/")
-set(EMSCRIPTEN_USE_FLAGS -sUSE_SDL=2 -sFETCH)
+set(EMSCRIPTEN_USE_FLAGS -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sFETCH)
 set(EMSCRIPTEN_EXCEPTION_FLAG -fwasm-exceptions)
 set(EMSCRIPTEN_SHELL_FLAG --shell-file ${CMAKE_SOURCE_DIR}/src/shell.html)
 set(EMSCRIPTEN_LINK_OPENGL_FLAGS
@@ -57,6 +57,7 @@ add_executable(engine
     src/shader.cpp
     src/stbi.cpp
     src/fetch.cpp
+    src/sound.cpp
 )
 
 target_include_directories(engine PUBLIC

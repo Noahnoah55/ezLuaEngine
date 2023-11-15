@@ -2,6 +2,7 @@
 #include"shader.hpp"
 #include"gfx.hpp"
 #include"input.hpp"
+#include"sound.hpp"
 
 #include<spdlog/spdlog.h>
 
@@ -30,6 +31,7 @@ int ezlua::engine::initialize()
 
     this->modules.push_back(new input());
     this->modules.push_back(new gfx());
+    this->modules.push_back(new sound());
 
     for (module *m : this->modules) {
         int ret = m->initialize(&this->lua_state);
