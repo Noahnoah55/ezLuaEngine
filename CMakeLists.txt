@@ -6,12 +6,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(EMSCRIPTEN_LINK_PRELOAD_FLAGS
 "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/src/shaders@/shaders/"
 "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/default-assets@/")
-set(EMSCRIPTEN_USE_FLAGS -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sFETCH)
+set(EMSCRIPTEN_USE_FLAGS -sUSE_SDL=2 -sUSE_SDL_MIXER=2)
 set(EMSCRIPTEN_EXCEPTION_FLAG -fwasm-exceptions)
 set(EMSCRIPTEN_SHELL_FLAG --shell-file ${CMAKE_SOURCE_DIR}/src/shell.html)
 set(EMSCRIPTEN_LINK_OPENGL_FLAGS
 -sMIN_WEBGL_VERSION=2
--sMAX_WEBGL_VERSION=2)
+-sMAX_WEBGL_VERSION=2
+-sFETCH)
 
 add_library(lua
     lua/lapi.c
@@ -76,7 +77,7 @@ target_compile_definitions(engine PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
 if(EMSCRIPTEN)
     message("Using emscripten!")
     target_compile_options(lua PUBLIC ${EMSCRIPTEN_EXCEPTION_FLAG} -O3)
-    target_compile_options(engine PUBLIC ${EMSCRIPTEN_EXCEPTION_FLAG} -O3)
+    target_compile_options(engine PUBLIC ${EMSCRIPTEN_EXCEPTION_FLAG} ${EMSCRIPTEN_USE_FLAGS} -O3)
     target_link_options(engine PUBLIC
         --use-preload-plugins --emrun
         ${EMSCRIPTEN_LINK_OPENGL_FLAGS}
