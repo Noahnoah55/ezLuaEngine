@@ -53,10 +53,17 @@ std::string error_handler(std::string msg) {
 int ezlua::engine::init_lua() {
     lua_state.open_libraries(sol::lib::base, sol::lib::table, sol::lib::math, sol::lib::package);
     lua_state["__handler"] = error_handler;
-    auto pfr = lua_state.safe_script_file("/src/main.lua", sol::script_pass_on_error);
+    auto lr = lua_state.load_file("/src/main.lua");
+    if (!lr.valid()) {
+        sol::error err = lr;
+        spdlog::error("Lua error on loading /src/main.lua:\n{}",err.what());
+        return -1;
+    }
+    sol::protected_function pf = lr;
+    auto pfr = pf();
     if (!pfr.valid()) {
         sol::error err = pfr;
-        spdlog::error("Failed to load main.lua, reason: ", err.what());
+        spdlog::error("Lua error on running /src/main.lua:\n{}",err.what());
         return -1;
     }
     lua_ontick = sol::protected_function(lua_state["_update"], lua_state["__handler"]);
