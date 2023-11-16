@@ -79,7 +79,8 @@ if(EMSCRIPTEN)
     target_compile_options(lua PUBLIC ${EMSCRIPTEN_EXCEPTION_FLAG} -O3)
     target_compile_options(engine PUBLIC ${EMSCRIPTEN_EXCEPTION_FLAG} ${EMSCRIPTEN_USE_FLAGS} -O3)
     target_link_options(engine PUBLIC
-        --use-preload-plugins --emrun
+        --use-preload-plugins 
+        #--emrun
         ${EMSCRIPTEN_LINK_OPENGL_FLAGS}
         ${EMSCRIPTEN_EXCEPTION_FLAG}
         ${EMSCRIPTEN_LINK_PRELOAD_FLAGS}
