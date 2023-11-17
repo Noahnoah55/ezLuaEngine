@@ -18,6 +18,7 @@ namespace ezlua {
             int init_lua();
             sol::state lua_state;
             sol::protected_function lua_ontick;
+            void set_ontick(sol::function);
             
             std::vector<module*> modules;
     };

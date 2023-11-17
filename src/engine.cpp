@@ -67,8 +67,13 @@ int ezlua::engine::init_lua() {
         return -1;
     }
     lua_ontick = sol::protected_function(lua_state["_update"], lua_state["__handler"]);
+    lua_state.set_function("setUpdateCallback", &ezlua::engine::set_ontick, this);
 
     return 0;
+}
+
+void ezlua::engine::set_ontick(sol::function f) {
+    lua_ontick = sol::protected_function(f, lua_state["__handler"]);
 }
 
 void ezlua::engine::tick() {
